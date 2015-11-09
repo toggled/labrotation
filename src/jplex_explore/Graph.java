@@ -21,7 +21,7 @@ public class Graph {
         FileOutputStream fos;
         BufferedWriter bw;
         FileWriter fileWriter;
-
+        int cliquecount;
         BufferedWriter writer ;
 	public static void main(String[] args) throws IOException{
                 String filename = "datasets/0.edges";
@@ -37,8 +37,8 @@ public class Graph {
 	}
 	public Graph(String fname) {
             try {
-                this.fos = new FileOutputStream(this.f);
-                this.bw = new BufferedWriter(new OutputStreamWriter(this.fos));
+                //this.fos = new FileOutputStream(this.f);
+                //this.bw = new BufferedWriter(new OutputStreamWriter(this.fos));
                 this.fileWriter = new FileWriter(f);
                 this.writer = new BufferedWriter(fileWriter);
             } catch (FileNotFoundException ex) {
@@ -125,13 +125,17 @@ public class Graph {
 				}
 				int[] cliqueVertexes = new int[i + 2];
 				System.out.println("candidate vertexes count: " + vertexes.size());
+                                cliquecount = 0;
 				getCliquesWithSpecificDegree(0, 0, cliqueVertexes, vertexes);
+                                System.out.println(cliquecount); //checking the cliquecount. It clearly mismatches
+                                                            // the number of line in the output file.
 			}
 		}
             try {
-                this.bw.flush();
-                this.bw.close();
+                //this.bw.flush();
+                //this.bw.close();
                 this.writer.close();
+                
             } catch (IOException ex) {
                 Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -163,11 +167,12 @@ public class Graph {
                                         
                                 }
                             try {
-                                System.out.println(vertices_str);
+                                System.out.println(vertices_str); //what i am writing in the console
                                 //this.bw.write(vertices_str);
                                 //this.bw.newLine();
-                                this.writer.write(vertices_str);
-                                //this.writer.newLine();
+                                this.writer.write(vertices_str); // What i am writing in the output
+                                cliquecount++; 
+                                this.writer.newLine();
                             } catch (IOException ex) {
                                 Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
                             }
