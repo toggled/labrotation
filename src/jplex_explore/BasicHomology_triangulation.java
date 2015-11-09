@@ -41,6 +41,7 @@ public class BasicHomology_triangulation {
     public static void main(String[] args) {
         ExplicitSimplexStream stream = new ExplicitSimplexStream();
 
+           /*
        
         Scanner sn = null;
         String dataset_file = "datasets/testcase.edges";
@@ -72,7 +73,7 @@ public class BasicHomology_triangulation {
             checkfaces(G,vertices,stream);
             
         }
-
+        */
         /*
          stream.addVertex(0);
          stream.addVertex(1);
@@ -100,7 +101,29 @@ public class BasicHomology_triangulation {
          stream.addElement(new int [] {3, 4, 5}, 7);
          */
          
-        stream.finalizeStream();
+         stream.addVertex(1); 
+         stream.addVertex(2);
+         stream.addVertex(3);
+         stream.addVertex(4);
+         stream.addVertex(5);
+         stream.addElement(new int[] {1,2});
+         stream.addElement(new int [] {2, 3});
+         stream.addElement(new int [] {3, 4});
+             
+         stream.addElement(new int[] {4, 1});
+         stream.addElement(new int [] {3, 1});
+         stream.addElement(new int[] {4, 2});
+         stream.addElement(new int [] {4, 5});
+         //stream.addElement(new int[] {5, 1});
+                
+         stream.addElement(new int [] {3, 4, 2});
+         stream.addElement(new int [] {1, 4, 2});
+         stream.addElement(new int [] {3, 1, 2});
+         stream.addElement(new int [] {3, 1, 4});
+         //stream.addElement(new int [] {4, 1, 5});
+         //stream.addElement(new int [] {1, 2, 3, 4});
+         
+         stream.finalizeStream();
 
         System.out.println("Size of complex: " + stream.getSize());
 
@@ -112,7 +135,7 @@ public class BasicHomology_triangulation {
 
         System.out.println(circle_intervals); // printing betti intervals
 
-        generate_barcode_image(circle_intervals);
+        //generate_barcode_image(circle_intervals);
         generate_representative_cycle(stream,persistence);
         //System.out.println(stream.validateVerbose());
         

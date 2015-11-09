@@ -116,7 +116,8 @@ public class Graph {
 			for(int j = i; j < vertexCountWithSameDegree.length; j++)
 				candidateVertexesCount+=vertexCountWithSameDegree[j];
 			if(candidateVertexesCount >= i + 2){
-                                if(i+2 == 4) return;
+                                //if(i+2 == 5) return;
+                                if(i+2 >10) return;
 				System.out.println("cliques with vertexes: " + (i + 2));
 				Vector<Integer> vertexes = new Vector<Integer>();
 				for(int j = 0; j < vertexCount; j++){
@@ -126,15 +127,23 @@ public class Graph {
 				int[] cliqueVertexes = new int[i + 2];
 				System.out.println("candidate vertexes count: " + vertexes.size());
                                 cliquecount = 0;
+                            try {
+                                this.writer.write(Integer.toString(i+2));
+                                this.writer.newLine();
+                            } catch (IOException ex) {
+                                Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
+                            }
 				getCliquesWithSpecificDegree(0, 0, cliqueVertexes, vertexes);
-                                System.out.println(cliquecount); //checking the cliquecount. It clearly mismatches
+                                //System.out.println(cliquecount); //checking the cliquecount. It clearly mismatches
                                                             // the number of line in the output file.
+                                
 			}
 		}
             try {
                 //this.bw.flush();
                 //this.bw.close();
                 this.writer.close();
+		this.bw.close();
                 
             } catch (IOException ex) {
                 Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
@@ -173,6 +182,7 @@ public class Graph {
                                 this.writer.write(vertices_str); // What i am writing in the output
                                 cliquecount++; 
                                 this.writer.newLine();
+				this.writer.flush();
                             } catch (IOException ex) {
                                 Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
                             }
