@@ -24,7 +24,7 @@ public class Graph {
         int cliquecount;
         BufferedWriter writer ;
 	public static void main(String[] args) throws IOException{
-                String filename = "datasets/0.edges";
+                String filename = "datasets/414.edges";
 		// TODO Auto-generated method stub
 		/*if(args.length != 1){
 			System.err.println("example command: java -cp ./ Graph graph-file");
@@ -109,15 +109,13 @@ public class Graph {
 		return true;
 	}
 	
-	public void getAllCliques() {
+	public void getAllCliques() throws IOException{
 		for(int i = 1; i < vertexCountWithSameDegree.length; i++){
 			//check whether enough vertexes with enough degree exist
 			int candidateVertexesCount = 0;
 			for(int j = i; j < vertexCountWithSameDegree.length; j++)
 				candidateVertexesCount+=vertexCountWithSameDegree[j];
 			if(candidateVertexesCount >= i + 2){
-                                //if(i+2 == 5) return;
-                                if(i+2 >10) return;
 				System.out.println("cliques with vertexes: " + (i + 2));
 				Vector<Integer> vertexes = new Vector<Integer>();
 				for(int j = 0; j < vertexCount; j++){
@@ -127,38 +125,41 @@ public class Graph {
 				int[] cliqueVertexes = new int[i + 2];
 				System.out.println("candidate vertexes count: " + vertexes.size());
                                 cliquecount = 0;
-                            try {
-                                this.writer.write(Integer.toString(i+2));
-                                this.writer.newLine();
-                            } catch (IOException ex) {
-                                Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
-                            }
 				getCliquesWithSpecificDegree(0, 0, cliqueVertexes, vertexes);
-                                //System.out.println(cliquecount); //checking the cliquecount. It clearly mismatches
+                                System.out.println(cliquecount); //checking the cliquecount. It clearly mismatches
                                                             // the number of line in the output file.
-                                
 			}
 		}
             try {
                 //this.bw.flush();
                 //this.bw.close();
                 this.writer.close();
-		this.bw.close();
+		//this.bw.close();
                 
             } catch (IOException ex) {
                 Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
             }
 	}
-	private void getCliquesWithSpecificDegree(int index, int start, int[] cliqueVertexes, Vector<Integer> candidateVertexes){
+	private void getCliquesWithSpecificDegree(int index, int start, int[] cliqueVertexes, Vector<Integer> candidateVertexes) throws IOException{
 		if(index < cliqueVertexes.length){
 			for(int i = start; i <= candidateVertexes.size() - (cliqueVertexes.length - index); i++){
+				int currentVertex = candidateVertexes.get(i);
+				boolean connectedWithFrontVertexes = true;
+				for(int j = 0; j < index; j++){
+					if(!ajacentMatrix[cliqueVertexes[j]][currentVertex]){
+						connectedWithFrontVertexes = false;
+						break;
+					}
+				}
+				if(!connectedWithFrontVertexes)
+					continue;
 				cliqueVertexes[index] = candidateVertexes.get(i);
 				getCliquesWithSpecificDegree(index + 1, i + 1, cliqueVertexes, candidateVertexes);
 			}
 		}else{
 			//check whether it is clique
 			boolean fullConnected = true;
-			for(int i = 0; i < cliqueVertexes.length; i++){
+			/*for(int i = 0; i < cliqueVertexes.length; i++){
 				for(int j = i + 1; j < cliqueVertexes.length; j++){
 					if(!ajacentMatrix[cliqueVertexes[i]][cliqueVertexes[j]]){
 						fullConnected = false;
@@ -167,7 +168,7 @@ public class Graph {
 				}
 				if(!fullConnected)
 					break;
-			}
+			}*/
 			if(fullConnected){
                                 String vertices_str = "";
 				for(int i = 0; i < cliqueVertexes.length; i++){
@@ -175,18 +176,13 @@ public class Graph {
 					//System.out.print((cliqueVertexes[i] + 1) + " ");
                                         
                                 }
-                            try {
-                                System.out.println(vertices_str); //what i am writing in the console
+                                //System.out.println(vertices_str); //what i am writing in the console
                                 //this.bw.write(vertices_str);
                                 //this.bw.newLine();
                                 this.writer.write(vertices_str); // What i am writing in the output
                                 cliquecount++; 
                                 this.writer.newLine();
 				this.writer.flush();
-                            } catch (IOException ex) {
-                                Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-				//System.out.println();
 			}
 		}
 	}
