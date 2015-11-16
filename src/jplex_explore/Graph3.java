@@ -67,6 +67,7 @@ public class Graph3 {
                 //System.out.println(vertexCount);
 		//initialize adjacent matrix
 		ajacentMatrix = new boolean[vertexCount][vertexCount];
+                int[] flag_file = new int[vertexCount+1]; // flag for checking whether a vertex has been writen as simplex in the file or not
 		for(int i = 0; i < vertexCount; i++){
 			for(int j = 0; j < vertexCount; j++){
 				ajacentMatrix[i][j] = false; 
@@ -83,6 +84,15 @@ public class Graph3 {
                         //System.out.println(lines.get(i));
 			ajacentMatrix[sourceNodeIndex - 1][targetNodeIndex - 1] = true;
 			ajacentMatrix[targetNodeIndex - 1][sourceNodeIndex - 1] = true;
+                        if ( flag_file[sourceNodeIndex] == 0){ 
+                            flag_file[sourceNodeIndex] = 1;
+                            this.writer.write(tokens[0]+"\n");
+                        }
+                        if ( flag_file[targetNodeIndex] == 0){ 
+                            flag_file[targetNodeIndex] = 1;
+                            this.writer.write(tokens[1]+"\n");
+                        }
+                        this.writer.write(tokens[0]+" "+tokens[1]+"\n");
 		}
 		//initialize degree array;
 		degreeArray = new int[vertexCount];

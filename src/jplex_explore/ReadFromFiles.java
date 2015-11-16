@@ -10,7 +10,7 @@ import java.util.Vector;
 
 
 public class ReadFromFiles {
-        Hashtable<Integer, Integer> mapping = new Hashtable< Integer, Integer>();  // mapping function from graph id given as input to internal representation.
+        static Hashtable<Integer, Integer> mapping = new Hashtable< Integer, Integer>();  // mapping function from graph id given as input to internal representation.
                                                                                     // coz graph id won't always be starting with 1. so need some internal representation.
 	public boolean readin(String inFname, Vector<String> lines) throws IOException{
 		File file = new File(inFname);
