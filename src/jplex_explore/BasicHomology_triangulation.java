@@ -52,16 +52,17 @@ public class BasicHomology_triangulation {
        
         Scanner sn = null;
         //String dataset_file = "datasets/testcase.edges";
-        String dataset_file = "datasets/414.edges";
+        /*
+        String dataset_file = "datasets/698.edges";
         try {
             sn = new Scanner(new File(dataset_file));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
         }
         int from, to;
-        int[] flag = new int[1000];
+        int[] flag = new int[100000];
         AdjMatrixGraph G = new AdjMatrixGraph(1000);
-        
+        /*
         while (sn.hasNextInt()) {
             int[] vertices = new int[2];
             vertices[0] = sn.nextInt();
@@ -75,12 +76,12 @@ public class BasicHomology_triangulation {
                 flag[vertices[1]] = 1;
             }
             stream.addElement(vertices);
-            G.addEdge(vertices[0],vertices[1]);
+            //G.addEdge(vertices[0],vertices[1]);
             // check whether to add a face
             //checkfaces(G,vertices,stream);
                
         }
-        
+        */
         int maxdimension = addhigherelement(stream,"simplices.out");
         // int maxdimension = 3;
        /*
@@ -135,15 +136,15 @@ public class BasicHomology_triangulation {
          stream.finalizeStream();
 
         System.out.println("Size of complex: " + stream.getSize());
-
+        System.out.println("maxdimension: "+maxdimension);
         AbstractPersistenceAlgorithm<Simplex> persistence
                 = Plex4.getModularSimplicialAlgorithm(maxdimension, 2);
         
         BarcodeCollection<Double> circle_intervals
                 = persistence.computeIntervals(stream); // computing betti intervals
         
-        System.out.println(circle_intervals); // printing betti intervals
-
+        //System.out.println(circle_intervals); // printing betti intervals
+        System.out.println(circle_intervals.getBettiNumbers());
         //generate_barcode_image(circle_intervals,maxdimension);
         generate_representative_cycle(stream,persistence);
         //System.out.println(stream.validateVerbose());
@@ -164,6 +165,7 @@ public class BasicHomology_triangulation {
             AnnotatedBarcodeCollection it = abs.computeAnnotatedIntervals(stream);
             //System.out.println(it);
             Iterator itt = it.getIntervalIterator();
+          
             while(itt.hasNext()){
                 String s = itt.next().toString();
                 try {
@@ -215,8 +217,12 @@ public class BasicHomology_triangulation {
     }
 
     private static int addhigherelement(ExplicitSimplexStream stream, String simplicesout) {
+        /*
+        Read all the cliques from a file line by line and add it to the simplical complex
+        */
         File f = new File(simplicesout);
-        int maxclique = 3;
+        
+        int maxclique = 1;
         try {
             InputStreamReader isr = new InputStreamReader(new FileInputStream(f));
             BufferedReader br;
@@ -226,18 +232,25 @@ public class BasicHomology_triangulation {
             while((lineTxt = br.readLine()) != null){
                 String[] tokens = lineTxt.split(" ");
                 int[] elem = new int[tokens.length];
-                maxclique = tokens.length;
+                maxclique = (tokens.length>maxclique?tokens.length:maxclique);
                 for (int i = 0; i < tokens.length; i++) {
                     elem[i] = Integer.valueOf(tokens[i]);
                 }
-                stream.addElement(elem);
+                if(tokens.length == 1){
+                    stream.addVertex(Integer.valueOf(tokens[0])); // when we add 0-simplex or clique of size 1
+                    //System.out.println(tokens[0]);
+                }
+                else 
+                    stream.addElement(elem);
             }
+            System.out.println("stream size: "+stream.getSize());
         } catch (FileNotFoundException ex) {
             Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
         }
         return maxclique;
+        
          
     }
 
