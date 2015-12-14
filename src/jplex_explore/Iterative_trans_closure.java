@@ -31,13 +31,14 @@ public class Iterative_trans_closure {
 	private int vertexCountWithSameDegree[] = null;
         File f = new File("cliques.out");
         FileOutputStream fos;
-        BufferedWriter bw;
         FileWriter fileWriter;
         int cliquecount;
         BufferedWriter writer ;
         boolean stableflag = false;
         int k_closure = 1;
         static Graph_writer gwriter = new Graph_writer();
+        static String graph_base_filename = "graph";
+        String clique_base_filename = "clique";
     public static void main(String[] args) {
         // TODO code application logic here
         //String filename = "datasets/0.edges";
@@ -56,13 +57,13 @@ public class Iterative_trans_closure {
             g.printadjmat();
             g.compute_degre();
             g.getAllCliques();
-            gwriter.write_graph(g.ajacentMatrix,"graph_"+g.k_closure+".edges","edgelist");
+            gwriter.write_graph(g.ajacentMatrix,graph_base_filename+g.k_closure+".edges","edgelist");
             while(true){          
                     g.compute_transitive_closure();
                     if(g.stableflag)    break;
                     
                     g.k_closure++;
-                    gwriter.write_graph(g.ajacentMatrix,"graph_"+g.k_closure+".edges","edgelist");
+                    gwriter.write_graph(g.ajacentMatrix,graph_base_filename+g.k_closure+".edges","edgelist");
                     g.compute_degre(); // compute degree each time before you run cliqe algorithm
                     g.init_cliquewriter(g.k_closure);
                     g.getAllCliques();
@@ -71,6 +72,7 @@ public class Iterative_trans_closure {
                     
                     
             }
+            g.gen_configfile();
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -289,7 +291,7 @@ public class Iterative_trans_closure {
             try {
                 //this.fos = new FileOutputStream(this.f);
                 //this.bw = new BufferedWriter(new OutputStreamWriter(this.fos));
-                this.f = new File("cliques"+"_"+k+".out");
+                this.f = new File(clique_base_filename+"_"+k+".out");
                 this.fileWriter = new FileWriter(f);
                 this.writer = new BufferedWriter(fileWriter);
             } catch (FileNotFoundException ex) {
@@ -297,5 +299,26 @@ public class Iterative_trans_closure {
             } catch (IOException ex) {
                 Logger.getLogger(Graph3.class.getName()).log(Level.SEVERE, null, ex);
             }
+    }
+    private void gen_configfile(){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try {
+            File f = new File("cliquecon.cfg");
+            fw = new FileWriter(f);
+             bw = new BufferedWriter(fw);
+            bw.write("cliquefile="+this.clique_base_filename+"\n");
+            bw.write("graphfile="+graph_base_filename+"\n");
+            bw.write("maxclosure="+String.valueOf(this.k_closure)+"\n");
+        } catch (IOException ex) {
+            Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+            
+                bw.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
