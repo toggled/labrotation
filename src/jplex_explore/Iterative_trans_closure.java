@@ -5,7 +5,6 @@
  */
 package jplex_explore;
 
-import bsh.This;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import jplex_explore.Graph_writer;
 /**
  *
  * @author naheed
@@ -38,11 +37,11 @@ public class Iterative_trans_closure {
         BufferedWriter writer ;
         boolean stableflag = false;
         int k_closure = 1;
-        
+        static Graph_writer gwriter = new Graph_writer();
     public static void main(String[] args) {
         // TODO code application logic here
-        String filename = "datasets/0.edges";
-        //String filename = "datasets/testcase.edges";
+        //String filename = "datasets/0.edges";
+        String filename = "datasets/testcase.edges";
         
 		// TODO Auto-generated method stub
 		/*if(args.length != 1){
@@ -57,11 +56,13 @@ public class Iterative_trans_closure {
             g.printadjmat();
             g.compute_degre();
             g.getAllCliques();
+            gwriter.write_graph(g.ajacentMatrix,"graph_"+g.k_closure+".edges","edgelist");
             while(true){          
                     g.compute_transitive_closure();
                     if(g.stableflag)    break;
                     
                     g.k_closure++;
+                    gwriter.write_graph(g.ajacentMatrix,"graph_"+g.k_closure+".edges","edgelist");
                     g.compute_degre(); // compute degree each time before you run cliqe algorithm
                     g.init_cliquewriter(g.k_closure);
                     g.getAllCliques();
