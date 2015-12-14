@@ -28,10 +28,10 @@ public class Graph_writer {
             if(option.equalsIgnoreCase("edgelist")){
                 System.out.println("hi"+adj_mat.length);
                 //write the graph as an edgelist.
-                for(int i =0 ; i<adj_mat.length; i++){
+                for(int i = 0 ; i<adj_mat.length; i++){
                     for (int j = i; j < adj_mat[i].length; j++) {
                         if(adj_mat[i][j]){
-                            writer.write(String.valueOf(i)+" "+String.valueOf(j)+"\n");
+                            writer.write(String.valueOf(i+1)+" "+String.valueOf(j+1)+"\n");
                         }
                     }
                 }
