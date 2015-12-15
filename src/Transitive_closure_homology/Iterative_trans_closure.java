@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package jplex_explore;
+package Transitive_closure_homology;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,7 +14,8 @@ import java.io.IOException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jplex_explore.Graph_writer;
+import jplex_explore.Graph3;
+import jplex_explore.ReadFromFiles;
 /**
  *
  * @author naheed
@@ -308,8 +309,9 @@ public class Iterative_trans_closure {
             fw = new FileWriter(f);
              bw = new BufferedWriter(fw);
             bw.write("cliquefile="+this.clique_base_filename+"\n");
-            bw.write("graphfile="+graph_base_filename+"\n");
+            
             bw.write("maxclosure="+String.valueOf(this.k_closure)+"\n");
+            bw.write("graphfile="+graph_base_filename+"\n");
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
         } finally {

@@ -1,4 +1,4 @@
-package jplex_explore;
+package Transitive_closure_homology;
 
 import edu.stanford.math.plex4.api.Plex4;
 import edu.stanford.math.plex4.homology.barcodes.AnnotatedBarcodeCollection;
@@ -10,25 +10,31 @@ import edu.stanford.math.plex4.homology.interfaces.AbstractPersistenceBasisAlgor
 import edu.stanford.math.plex4.streams.impl.ExplicitSimplexStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import edu.stanford.math.plex4.visualization.*;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 import javax.imageio.ImageIO;
-import java.util.HashMap;
-public class BasicHomology_triangulation {
+import jplex_explore.AdjMatrixGraph;
+public class BasicHomology_triangulation_trans {
+    String clique_base_filename;
+   int max_closure;
 
+    public BasicHomology_triangulation_trans() {
+        
+    }
+    
     private static void generate_barcode_image(BarcodeCollection<Double> circle_intervals,int maxdim) {
         List<Interval<Double>> interv;
         Interval in;
@@ -40,117 +46,21 @@ public class BasicHomology_triangulation {
                 File outputfile = new File("saved" + i + ".png");
                 ImageIO.write(im, "png", outputfile);
             } catch (IOException ex) {
-                Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
-    public static void main(String[] args) {
-        ExplicitSimplexStream stream = new ExplicitSimplexStream();
-
-        
-       
-        Scanner sn = null;
-        //String dataset_file = "datasets/testcase.edges";
-        /*
-        String dataset_file = "datasets/698.edges";
-        try {
-            sn = new Scanner(new File(dataset_file));
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
+   /* public static void main(String[] args) {
+        BasicHomology_triangulation_trans obj = new BasicHomology_triangulation_trans();
+        obj.read_clique_config();
+        for (int i = 1; i <= obj.max_closure; i++) {
+            obj.build_stream(i);
         }
-        int from, to;
-        int[] flag = new int[100000];
-        AdjMatrixGraph G = new AdjMatrixGraph(1000);
-        /*
-        while (sn.hasNextInt()) {
-            int[] vertices = new int[2];
-            vertices[0] = sn.nextInt();
-            vertices[1] = sn.nextInt();
-            if (flag[vertices[0]] == 0) {
-                stream.addVertex(vertices[0]);
-                flag[vertices[0]] = 1;
-            }
-            if (flag[vertices[1]] == 0) {
-                stream.addVertex(vertices[1]);
-                flag[vertices[1]] = 1;
-            }
-            stream.addElement(vertices);
-            //G.addEdge(vertices[0],vertices[1]);
-            // check whether to add a face
-            //checkfaces(G,vertices,stream);
-               
-        }
-        */
-        int maxdimension = addhigherelement(stream,"simplices.out");
-        // int maxdimension = 3;
-       /*
-         stream.addVertex(0);
-         stream.addVertex(1);
-         stream.addVertex(2);
-		
-         stream.addElement(new int[] {0,1});
-         stream.addElement(new int[] {1,2});
-         stream.addElement(new int[] {2,0});
-         
-       */
-             /*
-         stream.addVertex(1, 0); 
-         stream.addVertex(2, 0);
-         stream.addVertex(3, 0);
-         stream.addVertex(4, 0);
-         stream.addVertex(5, 1);
-         stream.addElement(new int[] {1,2}, 0);
-         stream.addElement(new int [] {2, 3}, 0);
-         stream.addElement(new int [] {3, 4}, 0);
-             
-         stream.addElement(new int[] {4, 1}, 0);
-         stream.addElement(new int [] {3, 5}, 2);
-         stream.addElement(new int [] {4, 5}, 3);
-                
-         stream.addElement(new int [] {3, 4, 5}, 7);
-         */
-         /*
-         stream.addVertex(1); 
-         stream.addVertex(2);
-         stream.addVertex(3);
-         stream.addVertex(4);
-         stream.addVertex(5);
-         stream.addElement(new int[] {1,2});
-         stream.addElement(new int [] {2, 3});
-         stream.addElement(new int [] {3, 4});
-             
-         stream.addElement(new int[] {4, 1});
-         stream.addElement(new int [] {3, 1});
-         stream.addElement(new int[] {4, 2});
-         stream.addElement(new int [] {4, 5});
-         //stream.addElement(new int[] {5, 1});
-                
-         stream.addElement(new int [] {3, 4, 2});
-         stream.addElement(new int [] {1, 4, 2});
-         stream.addElement(new int [] {3, 1, 2});
-         stream.addElement(new int [] {3, 1, 4});
-         //stream.addElement(new int [] {4, 1, 5});
-         //stream.addElement(new int [] {1, 2, 3, 4});
-         */
-         stream.finalizeStream();
-
-        System.out.println("Size of complex: " + stream.getSize());
-        System.out.println("maxdimension: "+maxdimension);
-        AbstractPersistenceAlgorithm<Simplex> persistence
-                = Plex4.getModularSimplicialAlgorithm(maxdimension, 2);
         
-        BarcodeCollection<Double> circle_intervals
-                = persistence.computeIntervals(stream); // computing betti intervals
-        
-        //System.out.println(circle_intervals); // printing betti intervals
-        System.out.println(circle_intervals.getBettiNumbers());
-        //generate_barcode_image(circle_intervals,maxdimension);
-        generate_representative_cycle(stream,persistence);
-        //System.out.println(stream.validateVerbose());
         
     }
-
+*/
     private static void generate_representative_cycle(ExplicitSimplexStream stream,AbstractPersistenceAlgorithm<Simplex> persistence) {
         AbstractPersistenceBasisAlgorithm abs = (AbstractPersistenceBasisAlgorithm) persistence;
         //System.out.println(abs.computeAnnotatedIntervals(stream));
@@ -172,7 +82,7 @@ public class BasicHomology_triangulation {
                     bw.write(s);
                     bw.newLine();
                 } catch (IOException ex) {
-                    Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
                 }
                
             }
@@ -186,7 +96,7 @@ public class BasicHomology_triangulation {
                     bw.write(s);
                     
                 } catch (IOException ex) {
-                    Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
                 }
                
             }
@@ -194,10 +104,10 @@ public class BasicHomology_triangulation {
                 bw.close();
                 //this.bw.newLine();
             } catch (IOException ex) {
-                Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -246,13 +156,65 @@ public class BasicHomology_triangulation {
             }
             System.out.println("stream size: "+stream.getSize());
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(BasicHomology_triangulation.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
         }
         return maxclique;
         
          
+    }
+
+    private void read_clique_config() {
+        String config_name = "cliquecon.cfg";
+        File f = new File(config_name);
+        FileReader fr = null;
+        try {
+            fr = new FileReader(f);
+        } catch (IOException ex) {
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        BufferedReader br = new BufferedReader(fr);
+        try {
+            // Reading the cliqeu base file name
+            String option = br.readLine();
+            StringTokenizer st  = new StringTokenizer(option,"=");
+            st.nextToken();
+            this.clique_base_filename  = st.nextToken();
+            
+            //Reading maxclosure
+             option = br.readLine();
+             st  = new StringTokenizer(option,"=");
+             st.nextToken();
+             this.max_closure  = Integer.valueOf(st.nextToken());
+        } catch (IOException ex) {
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+
+    private void build_stream(int kth_closure) {
+                
+        ExplicitSimplexStream stream = new ExplicitSimplexStream();
+        
+  
+        int maxdimension = addhigherelement(stream,this.clique_base_filename+"_"+kth_closure+".out");
+        
+         stream.finalizeStream();
+
+        System.out.println("Size of complex: " + stream.getSize());
+        System.out.println("maxdimension: "+maxdimension);
+        AbstractPersistenceAlgorithm<Simplex> persistence
+                = Plex4.getModularSimplicialAlgorithm(maxdimension, 2);
+        
+        BarcodeCollection<Double> circle_intervals
+                = persistence.computeIntervals(stream); // computing betti intervals
+        
+        //System.out.println(circle_intervals); // printing betti intervals
+        System.out.println(circle_intervals.getBettiNumbers());
+        //generate_barcode_image(circle_intervals,maxdimension);
+        generate_representative_cycle(stream,persistence);
+        //System.out.println(stream.validateVerbose());
     }
 
 }

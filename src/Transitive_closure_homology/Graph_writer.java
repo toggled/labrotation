@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package jplex_explore;
+package Transitive_closure_homology;
 
 import java.io.BufferedWriter;
 import java.io.File;
