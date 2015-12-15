@@ -43,7 +43,7 @@ public class Iterative_trans_closure {
     public static void main(String[] args) {
         // TODO code application logic here
         String filename = "datasets/0 (copy).edges";
-        //String filename = "datasets/testcase.edges";
+        //String filename = "datasets/testcase_2.edges";
             //String filename = "CA-GrQc.txt";
                  
 		// TODO Auto-generated method stub
@@ -91,11 +91,11 @@ public class Iterative_trans_closure {
                 copy_adjmat[i] = ajacentMatrix[i].clone();
             
             for (int row = 0; row < copy_adjmat.length; row++) {
-                boolean[] ajacentMatrix1 = copy_adjmat[row];
-                for (int col = row+1; col < ajacentMatrix1.length; col++) {
-                    boolean b = ajacentMatrix1[col];
+                //boolean[] ajacentMatrix1 = copy_adjmat[row];
+                for (int col = 0; col < copy_adjmat[0].length; col++) {
+                    //boolean b = ajacentMatrix1[col];
                     
-                    if(b==true){
+                    if(copy_adjmat[row][col]==true){
                         boolean[] columnsadjacency = copy_adjmat[col];
                         for (int i = col; i < columnsadjacency.length ; i++) {
                             if(columnsadjacency[i] == true){
