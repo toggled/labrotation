@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package geodesic_distance_metric_persistence;
+package geodesic_distance_metric_persistence_vrips_incomplete;
 
 import Transitive_closure_homology.*;
 import java.io.BufferedWriter;
@@ -32,7 +32,7 @@ public class Graph_writer {
                 for(int i = 0 ; i<adj_mat.length; i++){
                     for (int j = i; j < adj_mat[i].length; j++) {
                         if(adj_mat[i][j]){
-                            writer.write(String.valueOf(i+1)+" "+String.valueOf(j+1)+"\n");
+                            writer.write(String.valueOf(i)+" "+String.valueOf(j)+"\n");
                         }
                     }
                 }

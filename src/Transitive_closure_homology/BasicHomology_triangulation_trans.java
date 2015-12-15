@@ -242,11 +242,18 @@ public class BasicHomology_triangulation_trans {
                     elem[i] = Integer.valueOf(tokens[i]);
                 }
                 if(tokens.length == 1){
-                    this.stream.addVertex(Integer.valueOf(tokens[0])); // when we add 0-simplex or clique of size 1
+                    this.stream.addVertex(Integer.valueOf(tokens[0]),k); // when we add 0-simplex or clique of size 1
                     //System.out.println(tokens[0]);
                 }
-                else 
-                    this.stream.addElement(elem);
+                else{ 
+                    if(!this.stream.containsElement(new Simplex(elem))){
+                        for (int i = 0; i < elem.length; i++) {
+                            System.out.print(elem[i]+" ");
+                        }
+                        System.out.println("");
+                        this.stream.addElement(elem,k);
+                    }
+                }
             }
             System.out.println("stream size: "+this.stream.getSize());
         } catch (FileNotFoundException ex) {

@@ -3,20 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package geodesic_distance_metric_persistence;
+package geodesic_distance_metric_persistence_vrips_incomplete;
 
-import Transitive_closure_homology.*;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jplex_explore.Graph3;
-import jplex_explore.ReadFromFiles;
+
 /**
  *
  * @author naheed
@@ -79,6 +76,7 @@ public class Iterative_trans_closure {
                     
             }
             g.close_geodistwriter();
+            g.gen_configfile();
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -109,7 +107,7 @@ public class Iterative_trans_closure {
                                 if(this.ajacentMatrix[row][i] == false){
                                     this.ajacentMatrix[row][i] = true;
                                     this.ajacentMatrix[i][row] = true;
-                                    this.add_vertextovertex_dist(row+1,i+1,this.k_closure);
+                                    this.add_vertextovertex_dist(row,i,this.k_closure);
                                     changed = true;
                                 }                               
                             }
@@ -133,7 +131,7 @@ public class Iterative_trans_closure {
 		//vertexCount = Integer.parseInt(lines.get(0));
                 
                 vertexCount = reader.getVertexCount();
-                //System.out.println(vertexCount);
+                System.out.println(vertexCount);
                 formadjacency_mat(lines,vertexCount);
                 //compute_degre();
 		return true;
@@ -142,7 +140,7 @@ public class Iterative_trans_closure {
 
 		//initialize adjacent matrix
                 ajacentMatrix = new boolean[vertexCount][vertexCount];
-                int[] flag_file = new int[vertexCount+1]; // flag for checking whether a vertex has been writen as simplex in the file or not
+                int[] flag_file = new int[vertexCount]; // flag for checking whether a vertex has been writen as simplex in the file or not
 		for(int i = 0; i < vertexCount; i++){
 			for(int j = 0; j < vertexCount; j++){
 				ajacentMatrix[i][j] = false; 
@@ -157,8 +155,8 @@ public class Iterative_trans_closure {
 			int sourceNodeIndex = Integer.parseInt(tokens[0]);
 			int targetNodeIndex = Integer.parseInt(tokens[1]);
                         //System.out.println(lines.get(i));
-			ajacentMatrix[sourceNodeIndex - 1][targetNodeIndex - 1] = true;
-			ajacentMatrix[targetNodeIndex - 1][sourceNodeIndex - 1] = true;
+			ajacentMatrix[sourceNodeIndex][targetNodeIndex] = true;
+			ajacentMatrix[targetNodeIndex][sourceNodeIndex] = true;
                     try {
                         this.gdistbw.write(tokens[0]+" "+tokens[1]+" "+"1\n");
                         this.gdistbw.write(tokens[1]+" "+tokens[0]+" "+"1\n");
@@ -168,11 +166,19 @@ public class Iterative_trans_closure {
                         
                         if ( flag_file[sourceNodeIndex] == 0){ 
                             flag_file[sourceNodeIndex] = 1;
-                          
+                            try {
+                                this.gdistbw.write(tokens[0]+" "+tokens[0]+" "+"0\n");
+                            } catch (IOException ex) {
+                                Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
                         if ( flag_file[targetNodeIndex] == 0){ 
                             flag_file[targetNodeIndex] = 1;
-                           
+                            try {
+                                this.gdistbw.write(tokens[1]+" "+tokens[1]+" "+"0\n");
+                            } catch (IOException ex) {
+                                Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }                  
 		}
 		
@@ -192,15 +198,15 @@ public class Iterative_trans_closure {
         }
 
     private void init_geodistwriter() {
-            try {
-                 this.gdistfw = new FileWriter(gdistf);
-                 this.gdistbw = new BufferedWriter(this.gdistfw);
+           
+        try {
+            this.gdistfw = new FileWriter(gdistf);
+            this.gdistbw = new BufferedWriter(this.gdistfw);
+        } catch (IOException ex) {
+            Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+        }
                  
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Graph3.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Graph3.class.getName()).log(Level.SEVERE, null, ex);
-            }
+
     }
     private void add_vertextovertex_dist(int u,int v,int geodist){
         try {
@@ -217,6 +223,27 @@ public class Iterative_trans_closure {
             this.gdistbw.close();
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    private void gen_configfile(){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try {
+            File f = new File("cliquecon.cfg");
+            fw = new FileWriter(f);
+             bw = new BufferedWriter(fw);
+            bw.write("numvertices="+vertexCount+"\n");
+            bw.write("maxclosure="+String.valueOf(this.k_closure-1)+"\n");
+            bw.write("graphfile="+graph_base_filename+"\n");
+        } catch (IOException ex) {
+            Logger.getLogger(Transitive_closure_homology.Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+            
+                bw.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Transitive_closure_homology.Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-package geodesic_distance_metric_persistence;
+package geodesic_distance_metric_persistence_vrips_incomplete;
 
 import Transitive_closure_homology.*;
 import jplex_explore.*;
@@ -20,9 +20,10 @@ public class ReadFromFiles {
 			InputStreamReader read = new InputStreamReader(new FileInputStream(file));
 			BufferedReader bufferedReader = new BufferedReader(read);
 			String lineTxt = null;
-                        int id = 1; // internal representation of the vertex id's (starts from 1)
+                        int id = 0; // internal representation of the vertex id's (starts from 1)
 			while((lineTxt = bufferedReader.readLine()) != null){
                             String[] tokens = lineTxt.split(" ");
+                           // System.out.println(tokens);
                             int sourceNodeIndex = Integer.parseInt(tokens[0]);
                             int targetNodeIndex = Integer.parseInt(tokens[1]);
                             if(mapping.getOrDefault(sourceNodeIndex, -1) ==-1 ){
@@ -31,6 +32,7 @@ public class ReadFromFiles {
                             if(mapping.getOrDefault(targetNodeIndex, -1) ==-1 ){
                                 mapping.put(targetNodeIndex, id++);
                             }
+                           // System.out.println(mapping.get(sourceNodeIndex)+" "+mapping.get(targetNodeIndex));
                             lines.add(new String(mapping.get(sourceNodeIndex)+" "+mapping.get(targetNodeIndex)));
                         }
 			read.close();

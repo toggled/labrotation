@@ -1,4 +1,4 @@
-package geodesic_distance_metric_persistence;
+package geodesic_distance_metric_persistence_vrips_incomplete;
 
 import Transitive_closure_homology.*;
 import edu.stanford.math.plex4.api.Plex4;
@@ -8,7 +8,9 @@ import edu.stanford.math.plex4.homology.barcodes.Interval;
 import edu.stanford.math.plex4.homology.chain_basis.Simplex;
 import edu.stanford.math.plex4.homology.interfaces.AbstractPersistenceAlgorithm;
 import edu.stanford.math.plex4.homology.interfaces.AbstractPersistenceBasisAlgorithm;
+import edu.stanford.math.plex4.metric.impl.ExplicitMetricSpace;
 import edu.stanford.math.plex4.streams.impl.ExplicitSimplexStream;
+import edu.stanford.math.plex4.streams.impl.VietorisRipsStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
@@ -27,15 +29,35 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import javax.imageio.ImageIO;
-import jplex_explore.AdjMatrixGraph;
+
 public class Persistence_homology_trans {
-    String clique_base_filename;
+    String graph_filename;
     static int max_closure;
     ExplicitSimplexStream stream;
     int maxdimension;
     int kclosure;
+    int num_vertices;
+    double [][] distance_array;
     public Persistence_homology_trans() {
-        this.read_clique_config();  
+        read_clique_config();
+        this.read_distancefile(); 
+        //print_distfile();
+        ExplicitMetricSpace mspace;
+        mspace = new ExplicitMetricSpace(this.distance_array);
+        
+        //System.out.println(mspace.distance(4, 5));
+        int N = this.kclosure;
+        int tmax = N-1;
+        int maxdimension = 3;
+        VietorisRipsStream vstream = new VietorisRipsStream(mspace,maxdimension,tmax,N); 
+        
+        AbstractPersistenceAlgorithm<Simplex> persistence
+                = Plex4.getModularSimplicialAlgorithm(maxdimension, 2);
+        BarcodeCollection<Double> circle_intervals
+                = persistence.computeIntervals(vstream); // computing circle intervals
+        
+        System.out.println(vstream.getSize());
+        System.out.println(circle_intervals.getBettiNumbers());
     }
     
     private void generate_barcode_image(BarcodeCollection<Double> circle_intervals,int maxdim) {
@@ -46,7 +68,7 @@ public class Persistence_homology_trans {
             interv = circle_intervals.getIntervalsAtDimension(i);
             try {
                 im = BarcodeVisualizer.drawBarcode(interv, "dimension: " + i, 8.0); // last argument maximum limit of bar interval
-                File outputfile = new File(kclosure+clique_base_filename + i + "_barcode.png");
+                File outputfile = new File(kclosure+this.graph_filename + i + "_barcode.png");
                 ImageIO.write(im, "png", outputfile);
             } catch (IOException ex) {
                 Logger.getLogger(Persistence_homology_trans.class.getName()).log(Level.SEVERE, null, ex);
@@ -117,21 +139,6 @@ public class Persistence_homology_trans {
         }
     }
 
-    private static void checkfaces(AdjMatrixGraph G, int[] vertices,ExplicitSimplexStream stream) {
-        if(G.E()<=2) return;
-        
-            Iterator it = (Iterator) G.adj(vertices[0]);
-            while(it.hasNext()){
-                int adjacent_v = (int) it.next();
-                if(adjacent_v == vertices[1])   continue;
-                if (G.contains(adjacent_v, vertices[1])){
-                    stream.addElement(new int[]{vertices[0],vertices[1],adjacent_v});
-                    //System.out.println("okay");
-                    //System.out.println(adjacent_v);
-                }
-            }
-        
-    }
 
     private static int addhigherelement(ExplicitSimplexStream stream, String simplicesout) {
         /*
@@ -171,8 +178,9 @@ public class Persistence_homology_trans {
          
     }
 
-    private void read_clique_config() {
-        String config_name = "cliquecon.cfg";
+    private void read_distancefile() {
+        this.distance_array = new double[this.num_vertices][this.num_vertices];
+        String config_name = "geodist.dist";
         File f = new File(config_name);
         FileReader fr = null;
         try {
@@ -182,29 +190,35 @@ public class Persistence_homology_trans {
         }
         BufferedReader br = new BufferedReader(fr);
         try {
-            // Reading the cliqeu base file name
-            String option = br.readLine();
-            StringTokenizer st  = new StringTokenizer(option,"=");
-            st.nextToken();
-            this.clique_base_filename  = st.nextToken();
-            
-            //Reading maxclosure
-             option = br.readLine();
-             st  = new StringTokenizer(option,"=");
-             st.nextToken();
-             this.max_closure  = Integer.valueOf(st.nextToken());
+            String val;
+            while((val = br.readLine())!=null){
+         
+                StringTokenizer st  = new StringTokenizer(val," ");
+                
+                int from  = Integer.valueOf(st.nextToken());
+                int to  = Integer.valueOf(st.nextToken());
+                int dist  = Integer.valueOf(st.nextToken());
+                this.distance_array[from][to] = dist;
+            }
         } catch (IOException ex) {
             Logger.getLogger(Persistence_homology_trans.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }
-
+    private void print_distfile(){
+     for (int i = 0; i < this.distance_array.length; i++) {
+         for (int j = 0; j < this.distance_array[0].length; j++) {
+             System.out.print(this.distance_array[i][j]+" ");
+         }
+         System.out.println("");
+     }
+ }
     public ExplicitSimplexStream build_stream(int kth_closure) {
-                kclosure = kth_closure;
+        kclosure = kth_closure;
         ExplicitSimplexStream stream = new ExplicitSimplexStream();
         
   
-        this.maxdimension = addhigherelement(stream,this.clique_base_filename+"_"+kth_closure+".out");
+        this.maxdimension = addhigherelement(stream,this.graph_filename+"_"+kth_closure+".out");
         
         stream.finalizeStream();
          return stream;
@@ -257,5 +271,36 @@ public class Persistence_homology_trans {
         }
         this.stream.finalizeStream();
     }
-
+    private void read_clique_config() {
+        String config_name = "cliquecon.cfg";
+        File f = new File(config_name);
+        FileReader fr = null;
+        try {
+            fr = new FileReader(f);
+        } catch (IOException ex) {
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        BufferedReader br = new BufferedReader(fr);
+        try {
+            // Reading the cliqeu base file name
+            String option = br.readLine();
+            StringTokenizer st  = new StringTokenizer(option,"=");
+            st.nextToken();
+            this.num_vertices = Integer.valueOf(st.nextToken());
+            
+             option = br.readLine();
+             st  = new StringTokenizer(option,"=");
+             st.nextToken();
+             this.max_closure  = Integer.valueOf(st.nextToken());
+             
+             option = br.readLine();
+             st  = new StringTokenizer(option,"=");
+             st.nextToken();
+             this.graph_filename  = st.nextToken();
+             
+        } catch (IOException ex) {
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
 }
