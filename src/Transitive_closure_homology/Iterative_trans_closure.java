@@ -42,9 +42,10 @@ public class Iterative_trans_closure {
         String clique_base_filename = "clique";
     public static void main(String[] args) {
         // TODO code application logic here
-        //String filename = "datasets/0.edges";
-        String filename = "datasets/testcase.edges";
-        
+        String filename = "datasets/0 (copy).edges";
+        //String filename = "datasets/testcase.edges";
+            //String filename = "CA-GrQc.txt";
+                 
 		// TODO Auto-generated method stub
 		/*if(args.length != 1){
 			System.err.println("example command: java -cp ./ Graph graph-file");

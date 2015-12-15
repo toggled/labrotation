@@ -29,10 +29,11 @@ import javax.imageio.ImageIO;
 import jplex_explore.AdjMatrixGraph;
 public class BasicHomology_triangulation_trans {
     String clique_base_filename;
-   int max_closure;
-
+    static int max_closure;
+    ExplicitSimplexStream stream;
+    int maxdimension;
     public BasicHomology_triangulation_trans() {
-        
+        this.read_clique_config();  
     }
     
     private static void generate_barcode_image(BarcodeCollection<Double> circle_intervals,int maxdim) {
@@ -193,28 +194,62 @@ public class BasicHomology_triangulation_trans {
         
     }
 
-    private void build_stream(int kth_closure) {
+    public ExplicitSimplexStream build_stream(int kth_closure) {
                 
         ExplicitSimplexStream stream = new ExplicitSimplexStream();
         
   
-        int maxdimension = addhigherelement(stream,this.clique_base_filename+"_"+kth_closure+".out");
+        this.maxdimension = addhigherelement(stream,this.clique_base_filename+"_"+kth_closure+".out");
         
-         stream.finalizeStream();
-
-        System.out.println("Size of complex: " + stream.getSize());
-        System.out.println("maxdimension: "+maxdimension);
+        stream.finalizeStream();
+         return stream;
+       
+    }
+    void compute_betti_nums(){
+         System.out.println("Size of complex: " + this.stream.getSize());
+        System.out.println("maxdimension: "+ maxdimension);
         AbstractPersistenceAlgorithm<Simplex> persistence
                 = Plex4.getModularSimplicialAlgorithm(maxdimension, 2);
         
         BarcodeCollection<Double> circle_intervals
-                = persistence.computeIntervals(stream); // computing betti intervals
+                = persistence.computeIntervals(this.stream); // computing betti intervals
         
         //System.out.println(circle_intervals); // printing betti intervals
         System.out.println(circle_intervals.getBettiNumbers());
         //generate_barcode_image(circle_intervals,maxdimension);
-        generate_representative_cycle(stream,persistence);
+        generate_representative_cycle(this.stream,persistence);
         //System.out.println(stream.validateVerbose());
+    }
+    void add_to_stream(String simplicesfile){
+        File f = new File(simplicesfile);
+        int maxclique = 1;
+        try {
+            InputStreamReader isr = new InputStreamReader(new FileInputStream(f));
+            BufferedReader br;
+            br = new BufferedReader(isr);
+            String lineTxt = null;
+            
+            while((lineTxt = br.readLine()) != null){
+                String[] tokens = lineTxt.split(" ");
+                int[] elem = new int[tokens.length];
+                maxclique = (tokens.length>maxclique?tokens.length:maxclique);
+                for (int i = 0; i < tokens.length; i++) {
+                    elem[i] = Integer.valueOf(tokens[i]);
+                }
+                if(tokens.length == 1){
+                    this.stream.addVertex(Integer.valueOf(tokens[0])); // when we add 0-simplex or clique of size 1
+                    //System.out.println(tokens[0]);
+                }
+                else 
+                    this.stream.addElement(elem);
+            }
+            System.out.println("stream size: "+this.stream.getSize());
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        this.stream.finalizeStream();
     }
 
 }
