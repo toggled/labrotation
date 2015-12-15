@@ -34,7 +34,7 @@ public class Iterative_trans_closure {
         FileOutputStream fos;
         FileWriter fileWriter;
         int cliquecount;
-        BufferedWriter writer ;
+        BufferedWriter writer;
         boolean stableflag = false;
         int k_closure = 1;
         static Graph_writer gwriter = new Graph_writer();

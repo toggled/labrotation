@@ -32,11 +32,12 @@ public class BasicHomology_triangulation_trans {
     static int max_closure;
     ExplicitSimplexStream stream;
     int maxdimension;
+    int kclosure;
     public BasicHomology_triangulation_trans() {
         this.read_clique_config();  
     }
     
-    private static void generate_barcode_image(BarcodeCollection<Double> circle_intervals,int maxdim) {
+    private void generate_barcode_image(BarcodeCollection<Double> circle_intervals,int maxdim) {
         List<Interval<Double>> interv;
         Interval in;
         BufferedImage im;
@@ -44,7 +45,7 @@ public class BasicHomology_triangulation_trans {
             interv = circle_intervals.getIntervalsAtDimension(i);
             try {
                 im = BarcodeVisualizer.drawBarcode(interv, "dimension: " + i, 8.0); // last argument maximum limit of bar interval
-                File outputfile = new File("saved" + i + ".png");
+                File outputfile = new File(kclosure+clique_base_filename + i + "_barcode.png");
                 ImageIO.write(im, "png", outputfile);
             } catch (IOException ex) {
                 Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
@@ -62,11 +63,11 @@ public class BasicHomology_triangulation_trans {
         
     }
 */
-    private static void generate_representative_cycle(ExplicitSimplexStream stream,AbstractPersistenceAlgorithm<Simplex> persistence) {
+    private void generate_representative_cycle(ExplicitSimplexStream stream,AbstractPersistenceAlgorithm<Simplex> persistence,BarcodeCollection<Double> circle_intervals) {
         AbstractPersistenceBasisAlgorithm abs = (AbstractPersistenceBasisAlgorithm) persistence;
         //System.out.println(abs.computeAnnotatedIntervals(stream));
         // Write them to a file
-        File f = new File("homology.out");
+        File f = new File(kclosure+"homology"+".out");
         FileOutputStream fos;
         BufferedWriter bw;
         
@@ -96,12 +97,15 @@ public class BasicHomology_triangulation_trans {
                     bw.newLine();
                     bw.write(s);
                     
+                    
                 } catch (IOException ex) {
                     Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
                 }
                
             }
             try {
+                bw.newLine();
+                bw.write(circle_intervals.getBettiNumbers());
                 bw.close();
                 //this.bw.newLine();
             } catch (IOException ex) {
@@ -195,7 +199,7 @@ public class BasicHomology_triangulation_trans {
     }
 
     public ExplicitSimplexStream build_stream(int kth_closure) {
-                
+                kclosure = kth_closure;
         ExplicitSimplexStream stream = new ExplicitSimplexStream();
         
   
@@ -215,12 +219,13 @@ public class BasicHomology_triangulation_trans {
                 = persistence.computeIntervals(this.stream); // computing betti intervals
         
         //System.out.println(circle_intervals); // printing betti intervals
-        System.out.println(circle_intervals.getBettiNumbers());
-        //generate_barcode_image(circle_intervals,maxdimension);
-        generate_representative_cycle(this.stream,persistence);
+        //System.out.println(circle_intervals.getBettiNumbers());
+        generate_barcode_image(circle_intervals,maxdimension);
+        generate_representative_cycle(this.stream,persistence,circle_intervals);
         //System.out.println(stream.validateVerbose());
     }
-    void add_to_stream(String simplicesfile){
+    void add_to_stream(String simplicesfile,int k){
+        kclosure = k;
         File f = new File(simplicesfile);
         int maxclique = 1;
         try {

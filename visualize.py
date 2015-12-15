@@ -30,7 +30,7 @@ def create_myfbgraph():
         #G.add_edges_from( [ (1,3) ], color='red')
 def create_snapgraph():
     # filename = 'datasets/414.edges'    
-    filename = 'graph2.edges'
+    filename = 'graph4.edges'
     with open(filename,'r') as f:
         while 1:
             #print f.readline().split()
@@ -48,5 +48,5 @@ def create_snapgraph():
             
 create_snapgraph()
 #create_myfbgraph()
-nx.draw(G,node_size = 150,with_labels = 1)
+nx.draw(G,node_size = 150,with_labels = 0)
 plt.show()
