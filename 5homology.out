@@ -1,0 +1,6 @@
+0=[[0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity), [0.0, infinity)]
+1=[[0.0, 1.0)]
+
+0=[[92], [29], [67], [83], [31], [25], [87], [2], [38], [54], [40], [71], [65], [35], [78], [17], [8], [94], [14], [56], [4], [107], [100], [104], [0]]
+1=[[23,24] + [27,58] + -[23,58] + [24,27]]
+{0: 25, 1: 1}
