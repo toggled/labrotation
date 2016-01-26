@@ -44,8 +44,9 @@ public class Iterative_trans_closure {
     public static void main(String[] args) {
         // TODO code application logic here
         //String filename = "../datasets/0 (copy).edges";
-        //String filename = "../datasets/testcase_2.edges";
-        String filename = "../datasets/698.edges";
+        //String filename = "../datasets/friends.txt";
+       // String filename = "../datasets/3980.edges";
+        String filename = "../datasets/testcase_2.edges";
             //String filename = "CA-GrQc.txt";
                  
 		// TODO Auto-generated method stub
@@ -58,8 +59,8 @@ public class Iterative_trans_closure {
         try {
             if(!g.init())
                     return;
-            g.printadjmat();
-           g.compute_degre();
+            //g.printadjmat();
+            g.compute_degre();
             g.getAllCliques();
             gwriter.write_graph(g.ajacentMatrix,graph_base_filename+g.k_closure+".edges","edgelist");
             for(;;){
@@ -145,17 +146,19 @@ public class Iterative_trans_closure {
             
             for (int col = 0; col < copy_adjmat[0].length; col++) {
                 int sum = 0;
-                for (int row2 = 0; row2 < copy_adjmat[0].length; row2++) {
-                   
-                    sum += (copy_adjmat[row][row2]*copy_adjmat[row2][col]) ;
+                if(row!=col){
+                    for (int row2 = 0; row2 < copy_adjmat[0].length; row2++) {
 
-                }
+                        sum += (copy_adjmat[row][row2]*copy_adjmat[row2][col]) ;
+
+                    }
                 //System.out.print(sum+" ");
-                if( sum > 0){
-                    if(ajacentMatrix[row][col]!=1){
-                        ajacentMatrix[row][col] = 1 ;
-                        stableflag = false;
-                        }
+                    if( sum > 0){
+                        if(ajacentMatrix[row][col]!=1){
+                            ajacentMatrix[row][col] = 1 ;
+                            stableflag = false;
+                            }
+                    }
                 }
             }  
             

@@ -25,8 +25,9 @@ public class NewMain {
             
             
             //obj.compute_betti_nums();  
-        
+           //obj.add_to_stream("graph"+i+".edges", i); // for the tomita version
            obj.add_to_stream(obj.clique_base_filename+"_"+i+".out",i);
+           
             //obj.compute_betti_nums();
         }
         obj.compute_betti_nums();
