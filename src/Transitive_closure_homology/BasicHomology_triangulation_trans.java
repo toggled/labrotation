@@ -45,7 +45,7 @@ public class BasicHomology_triangulation_trans {
             interv = circle_intervals.getIntervalsAtDimension(i);
             try {
                 im = BarcodeVisualizer.drawBarcode(interv, "dimension: " + i, this.maxdimension); // last argument maximum limit of bar interval
-                File outputfile = new File(kclosure+clique_base_filename + i + "_barcode.png");
+                File outputfile = new File(clique_base_filename + i + "_barcode.png");
                 ImageIO.write(im, "png", outputfile);
             } catch (IOException ex) {
                 Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
@@ -136,6 +136,7 @@ public class BasicHomology_triangulation_trans {
         /*
         Read all the cliques from a file line by line and add it to the simplical complex
         */
+        System.out.println("Adding from: "+simplicesout);
         File f = new File(simplicesout);
         
         int maxclique = 1;
@@ -155,10 +156,14 @@ public class BasicHomology_triangulation_trans {
                 }
                 if(tokens.length == 1){
                     stream.addVertex(Integer.valueOf(tokens[0]),kclosure-1); // when we add 0-simplex or clique of size 1
-                    //System.out.println(tokens[0]);
+                    System.out.println(tokens[0]);
                 }
                 else 
                     stream.addElement(elem,kclosure-1);
+                    for (int i = 0; i < elem.length; i++) {
+                            System.out.print(elem[i]+" ");
+                        }
+                        System.out.println("");
                 //System.out.println("hk: "+(kclosure-1));
             }
             System.out.println("stream size: "+stream.getSize());
@@ -203,9 +208,9 @@ public class BasicHomology_triangulation_trans {
     public ExplicitSimplexStream build_stream(int kth_closure) {
         kclosure = kth_closure;
         ExplicitSimplexStream stream = new ExplicitSimplexStream();
-        for(int i = 1;i<=kth_closure;i++)
-             addhigherelement(stream,this.clique_base_filename+"_"+i+".out");
-        
+        //for(int i = 1;i<=kth_closure;i++)
+        //initialize_streamfromgraph(stream,"graph"+kth_closure+".edges"); //for the tomita version
+        addhigherelement(stream,this.clique_base_filename+"_"+kth_closure+".out");
         stream.finalizeStream();
         this.maxdimension = max_closure;
          return stream;
@@ -221,12 +226,13 @@ public class BasicHomology_triangulation_trans {
                 = persistence.computeIntervals(this.stream); // computing betti intervals
         
         //System.out.println(circle_intervals); // printing betti intervals
-        //System.out.println(circle_intervals.getBettiNumbers());
+        System.out.println(circle_intervals.getBettiNumbers());
         generate_barcode_image(circle_intervals,maxdimension);
         generate_representative_cycle(this.stream,persistence,circle_intervals);
-        //System.out.println(stream.validateVerbose());
+        System.out.println(stream.validateVerbose());
     }
     void add_to_stream(String simplicesfile,int k){
+        System.out.println("Adding from: "+simplicesfile);
         kclosure = k;
         File f = new File(simplicesfile);
         int maxclique = 1;
@@ -247,14 +253,14 @@ public class BasicHomology_triangulation_trans {
                 if(tokens.length == 1){
                     if(!this.stream.containsElement(new Simplex(elem)))
                         this.stream.addVertex(Integer.valueOf(tokens[0]),k-1); // when we add 0-simplex or clique of size 1
-                    //System.out.println(tokens[0]);
+                    System.out.println(tokens[0]);
                 }
                 else{ 
                     if(!this.stream.containsElement(new Simplex(elem))){
-                      /*  for (int i = 0; i < elem.length; i++) {
+                        for (int i = 0; i < elem.length; i++) {
                             System.out.print(elem[i]+" ");
                         }
-                        System.out.println("");*/
+                        System.out.println("");
                         this.stream.addElement(elem,k-1);
                     }
                     else{
@@ -275,5 +281,49 @@ public class BasicHomology_triangulation_trans {
         }
         this.stream.finalizeStream();
     }
+    
+    private void initialize_streamfromgraph(ExplicitSimplexStream stream, String simplicesout) {
+        /*
+        Read all the cliques from a file line by line and add it to the simplical complex
+        */
+        System.out.println("Adding from: "+simplicesout);
+        File f = new File(simplicesout);
+        
+        
+        try {
+            InputStreamReader isr = new InputStreamReader(new FileInputStream(f));
+            BufferedReader br;
+            br = new BufferedReader(isr);
+            String lineTxt = null;
+            
+            while((lineTxt = br.readLine()) != null){
+               // System.out.println(lineTxt);
+                String[] tokens = lineTxt.split(" ");
+                int[] elem = new int[tokens.length];
+               
+                for (int i = 0; i < tokens.length; i++) {
+                    elem[i] = Integer.valueOf(tokens[i]);
+                    stream.addVertex(elem[i],kclosure-1); // when we add 0-simplex or clique of size 1
+                    //System.out.println(tokens[0]);
+                }
+                
+                    stream.addElement(elem,kclosure-1);
+                    for (int i = 0; i < elem.length; i++) {
+                            System.out.print(elem[i]+" ");
+                        }
+                        System.out.println("");
+                //System.out.println("hk: "+(kclosure-1));
+            }
+            System.out.println("stream size: "+stream.getSize());
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+         
+    }
+
 
 }
