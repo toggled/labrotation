@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * @author naheed
  */
 public class Graph_writer {
-    static void write_graph(boolean adj_mat[][],String filename,String option){
+    static void write_graph(int adj_mat[][],String filename,String option){
         File fobj;
         FileWriter fwriterobj = null;
         BufferedWriter writer = null ;
@@ -31,7 +31,7 @@ public class Graph_writer {
                 //write the graph as an edgelist.
                 for(int i = 0 ; i<adj_mat.length; i++){
                     for (int j = i; j < adj_mat[i].length; j++) {
-                        if(adj_mat[i][j]){
+                        if(adj_mat[i][j] ==1){
                             writer.write(String.valueOf(i)+" "+String.valueOf(j)+"\n");
                         }
                     }

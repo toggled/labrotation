@@ -25,7 +25,8 @@ public class Iterative_trans_closure {
      */
     String graphFname = null;
 	private int vertexCount = 0;
-	private boolean ajacentMatrix[][] = null;
+	private int ajacentMatrix[][] = null;
+        private int geodist_Matrix[][] = null;
 	private int degreeArray[] = null;
 	private int vertexCountWithSameDegree[] = null;
         FileOutputStream fos;
@@ -34,16 +35,21 @@ public class Iterative_trans_closure {
  
         boolean stableflag = false;
         int k_closure = 1;
-        static Graph_writer gwriter = new Graph_writer();
+        //static Graph_writer gwriter = new Graph_writer();
         static String graph_base_filename = "graph";
-        String clique_base_filename = "clique";
+        
         File gdistf = new File("geodist.dist");
         FileWriter gdistfw;
         BufferedWriter gdistbw;
+        File gdist_matfile = new File("geodist.dist");
+        FileWriter gdistfw_mat;
+        BufferedWriter gdistbw_mat;
+        
     public static void main(String[] args) {
         // TODO code application logic here
-        //String filename = "datasets/0 (copy).edges";
-        String filename = "datasets/testcase_2.edges";
+        //String filename = "../datasets/0 (copy).edges";
+        //String filename = "../datasets/testcase_2.edges";
+        String filename = "../datasets/1912.edges";
             //String filename = "CA-GrQc.txt";
                  
 		// TODO Auto-generated method stub
@@ -51,27 +57,28 @@ public class Iterative_trans_closure {
 			System.err.println("example command: java -cp ./ Graph graph-file");
 			return ;
 		}*/
+                
 		Iterative_trans_closure g = new Iterative_trans_closure(filename);
                 
         try {
             if(!g.init())
                     return;
-            //g.printadjmat();
+             //g.printadjmat();
             //g.compute_degre();
             //g.getAllCliques();
-            gwriter.write_graph(g.ajacentMatrix,graph_base_filename+g.k_closure+".edges","edgelist");
+           // gwriter.write_graph(g.ajacentMatrix,graph_base_filename+g.k_closure+".edges","edgelist");
             while(true){    
                     if(g.stableflag)    break;
                     else{
                         g.k_closure++;
                         g.compute_transitive_closure();
 
-                        gwriter.write_graph(g.ajacentMatrix,graph_base_filename+g.k_closure+".edges","edgelist");
+                       // gwriter.write_graph(g.ajacentMatrix,graph_base_filename+g.k_closure+".edges","edgelist");
                        // g.compute_degre(); // compute degree each time before you run cliqe algorithm
                         //g.init_cliquewriter(g.k_closure);
                         //g.getAllCliques();
                         System.out.println(g.k_closure +"-th closure:\n");
-                       // g.printadjmat();
+                        //g.printadjmat();
                     }
                     
             }
@@ -87,7 +94,7 @@ public class Iterative_trans_closure {
 		// TODO Auto-generated constructor stub     
             this.graphFname = fname;
     }
-    	public void compute_transitive_closure(){
+    	/*public void compute_transitive_closure(){
             boolean changed = false;
             boolean [][] copy_adjmat = new boolean[ajacentMatrix.length][];
             for(int i = 0; i < ajacentMatrix.length; i++)
@@ -117,6 +124,7 @@ public class Iterative_trans_closure {
             }
             if(!changed)    this.stableflag = true;
         }
+    */
 	public boolean init() throws IOException{
 		ReadFromFiles reader = new ReadFromFiles();
 		Vector<String> lines = new Vector<String>();
@@ -131,19 +139,55 @@ public class Iterative_trans_closure {
 		//vertexCount = Integer.parseInt(lines.get(0));
                 
                 vertexCount = reader.getVertexCount();
-                System.out.println(vertexCount);
+               // System.out.println(vertexCount);
                 formadjacency_mat(lines,vertexCount);
                 //compute_degre();
 		return true;
 	}
+    public void compute_transitive_closure(){
+        stableflag = true;
+        int [][] copy_adjmat = new int[ajacentMatrix.length][];
+            for(int i = 0; i < ajacentMatrix.length; i++)
+                copy_adjmat[i] = ajacentMatrix[i].clone();
+        //this.printadjmat();
+        for(int row = 0; row< copy_adjmat[0].length; row++){
+            
+            for (int col = 0; col < copy_adjmat[0].length; col++) {
+                int sum = 0;
+                if(row!=col){
+                    for (int row2 = 0; row2 < copy_adjmat[0].length; row2++) {
+
+                        sum += (copy_adjmat[row][row2]*copy_adjmat[row2][col]) ;
+
+                    }
+                //System.out.print(sum+" ");
+                    if( sum > 0){
+                        if(ajacentMatrix[row][col]!=1){
+                            ajacentMatrix[row][col] = 1 ; //Adding new edge here
+                            this.add_vertextovertex_dist(row,col,this.k_closure);
+                            //System.out.println(row+"-"+col+":"+this.k_closure);
+                            stableflag = false;
+                            }
+                    }
+                }
+            }  
+            
+            //System.out.println();
+            //System.exit(1);
+        }
+       //this.printadjmat();
+      // System.exit(1);
+    }
+    
 	public void formadjacency_mat(Vector<String> lines,int vertexCount){
 
 		//initialize adjacent matrix
-                ajacentMatrix = new boolean[vertexCount][vertexCount];
-                int[] flag_file = new int[vertexCount]; // flag for checking whether a vertex has been writen as simplex in the file or not
+                ajacentMatrix = new int[vertexCount][vertexCount];
+                int[] flag_file = new int[vertexCount+1]; // flag for checking whether a vertex has been writen as simplex in the file or not
 		for(int i = 0; i < vertexCount; i++){
 			for(int j = 0; j < vertexCount; j++){
-				ajacentMatrix[i][j] = false; 
+				ajacentMatrix[i][j] = 0; 
+                                geodist_Matrix[i][j] = 0;
 			}
 		}
 		for(int i = 0; i < lines.size(); i++){
@@ -155,8 +199,8 @@ public class Iterative_trans_closure {
 			int sourceNodeIndex = Integer.parseInt(tokens[0]);
 			int targetNodeIndex = Integer.parseInt(tokens[1]);
                         //System.out.println(lines.get(i));
-			ajacentMatrix[sourceNodeIndex][targetNodeIndex] = true;
-			ajacentMatrix[targetNodeIndex][sourceNodeIndex] = true;
+			ajacentMatrix[sourceNodeIndex][targetNodeIndex] = geodist_Matrix[sourceNodeIndex][targetNodeIndex]= 1;
+			ajacentMatrix[targetNodeIndex][sourceNodeIndex] = geodist_Matrix[targetNodeIndex][sourceNodeIndex]=1;
                     try {
                         this.gdistbw.write(tokens[0]+" "+tokens[1]+" "+"1\n");
                         this.gdistbw.write(tokens[1]+" "+tokens[0]+" "+"1\n");
@@ -187,10 +231,7 @@ public class Iterative_trans_closure {
         private void printadjmat(){
             for (int i = 0; i < this.ajacentMatrix.length; i++) {
                 for (int j = 0; j < this.ajacentMatrix[0].length; j++) {
-                    if(this.ajacentMatrix[i][j])
-                        System.out.print("1 ");
-                    else
-                        System.out.print("0 ");
+                    System.out.print(ajacentMatrix[i][j]+" ");
                 }
                 System.out.println("");
             }
@@ -208,12 +249,24 @@ public class Iterative_trans_closure {
                  
 
     }
+    private void init_geodistwriter_matrix() {
+           
+        try {
+            this.gdistfw_mat = new FileWriter(gdistf);
+            this.gdistbw_mat = new BufferedWriter(this.gdistfw);
+        } catch (IOException ex) {
+            Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                 
+
+    }
     private void add_vertextovertex_dist(int u,int v,int geodist){
+        geodist_Matrix[u][v] = geodist;
         try {
             this.gdistbw.write(String.valueOf(u)+" "+String.valueOf(v)+" "+String.valueOf(geodist));
             this.gdistbw.newLine();
-             this.gdistbw.write(String.valueOf(v)+" "+String.valueOf(u)+" "+String.valueOf(geodist));
-            this.gdistbw.newLine();
+            //this.gdistbw.write(String.valueOf(v)+" "+String.valueOf(u)+" "+String.valueOf(geodist));
+            //this.gdistbw.newLine();
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -224,6 +277,29 @@ public class Iterative_trans_closure {
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    private void close_geodistwriter_mat(){
+        try {
+            this.gdistbw_mat.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    private void write_geodistmatrix(){
+        init_geodistwriter_matrix();
+        for (int i = 0; i < geodist_Matrix[0].length; i++) {
+            try {
+                for (int j = 0; j < geodist_Matrix[i].length; j++) {
+
+                        this.gdistbw_mat.write(geodist_Matrix[i][j]+" ");
+                    
+                }
+                this.gdistbw_mat.newLine();
+            } catch (IOException ex) {
+                Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        close_geodistwriter_mat();
     }
     private void gen_configfile(){
         FileWriter fw = null;
