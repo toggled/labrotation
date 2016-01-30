@@ -7,15 +7,13 @@ package Transitive_closure_homology;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jplex_explore.Graph3;
-import Transitive_closure_homology.ReadFromFiles.*;
+
 /**
  *
  * @author naheed
@@ -85,7 +83,7 @@ public class Iterative_trans_closure {
     }
     public Iterative_trans_closure(String fname) {
             init_cliquewriter(k_closure);
-		// TODO Auto-generated constructor stub     
+		  
             this.graphFname = fname;
     }
     /*public void compute_transitive_closure(){
@@ -260,15 +258,13 @@ public class Iterative_trans_closure {
                                                             // the number of line in the output file.
 			}
 		}
-            try {
+            
                 //this.bw.flush();
                 //this.bw.close();
                 this.writer.close();
 		//this.bw.close();
                 
-            } catch (IOException ex) {
-                Logger.getLogger(Graph3.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            
 	}
 	private void getCliquesWithSpecificDegree(int index, int start, int[] cliqueVertexes, Vector<Integer> candidateVertexes) throws IOException{
 		if(index < cliqueVertexes.length){
@@ -327,17 +323,17 @@ public class Iterative_trans_closure {
         }
 
     private void init_cliquewriter(int k) {
-            try {
-                //this.fos = new FileOutputStream(this.f);
-                //this.bw = new BufferedWriter(new OutputStreamWriter(this.fos));
-                this.f = new File(clique_base_filename+"_"+k+".out");
-                this.fileWriter = new FileWriter(f);
-                this.writer = new BufferedWriter(fileWriter);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(Graph3.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Graph3.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            
+        try {
+            //this.fos = new FileOutputStream(this.f);
+            //this.bw = new BufferedWriter(new OutputStreamWriter(this.fos));
+            this.f = new File(clique_base_filename+"_"+k+".out");
+            this.fileWriter = new FileWriter(f);
+            this.writer = new BufferedWriter(fileWriter);
+        } catch (IOException ex) {
+            Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
     }
     private void gen_configfile(){
         FileWriter fw = null;
