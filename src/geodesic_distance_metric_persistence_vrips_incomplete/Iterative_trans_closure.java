@@ -41,15 +41,16 @@ public class Iterative_trans_closure {
         File gdistf = new File("geodist.dist");
         FileWriter gdistfw;
         BufferedWriter gdistbw;
-        File gdist_matfile = new File("geodist.dist");
+        File gdist_matfile = new File("geodistMatrix.dist");
         FileWriter gdistfw_mat;
         BufferedWriter gdistbw_mat;
         
     public static void main(String[] args) {
         // TODO code application logic here
         //String filename = "../datasets/0 (copy).edges";
-        //String filename = "../datasets/testcase_2.edges";
-        String filename = "../datasets/1912.edges";
+        String filename = "../datasets/testcase_2.edges";
+        //String filename = "../datasets/3437.edges";
+        //String filename = "../datasets/newdata.edges";
             //String filename = "CA-GrQc.txt";
                  
 		// TODO Auto-generated method stub
@@ -63,7 +64,7 @@ public class Iterative_trans_closure {
         try {
             if(!g.init())
                     return;
-             //g.printadjmat();
+             g.printadjmat();
             //g.compute_degre();
             //g.getAllCliques();
            // gwriter.write_graph(g.ajacentMatrix,graph_base_filename+g.k_closure+".edges","edgelist");
@@ -78,12 +79,13 @@ public class Iterative_trans_closure {
                         //g.init_cliquewriter(g.k_closure);
                         //g.getAllCliques();
                         System.out.println(g.k_closure +"-th closure:\n");
-                        //g.printadjmat();
+                        g.printadjmat();
                     }
                     
             }
             g.close_geodistwriter();
             g.gen_configfile();
+            g.write_geodistmatrix(); // Write the whole distance Matrix for post-processing
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -183,6 +185,7 @@ public class Iterative_trans_closure {
 
 		//initialize adjacent matrix
                 ajacentMatrix = new int[vertexCount][vertexCount];
+                geodist_Matrix = new int[vertexCount][vertexCount];
                 int[] flag_file = new int[vertexCount+1]; // flag for checking whether a vertex has been writen as simplex in the file or not
 		for(int i = 0; i < vertexCount; i++){
 			for(int j = 0; j < vertexCount; j++){
@@ -252,8 +255,8 @@ public class Iterative_trans_closure {
     private void init_geodistwriter_matrix() {
            
         try {
-            this.gdistfw_mat = new FileWriter(gdistf);
-            this.gdistbw_mat = new BufferedWriter(this.gdistfw);
+            this.gdistfw_mat = new FileWriter(gdist_matfile);
+            this.gdistbw_mat = new BufferedWriter(this.gdistfw_mat);
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
         }
