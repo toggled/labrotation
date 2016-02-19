@@ -52,7 +52,7 @@ public class Iterative_trans_closure_random {
         //String filename = "../datasets/testcase_2.edges";
         //String filename = "../datasets/newdata.edges";
             //String filename = "CA-GrQc.txt";
-        nodelimit = 100;
+        nodelimit = 80;
 		// TODO Auto-generated method stub
 		/*if(args.length != 1){
 			System.err.println("example command: java -cp ./ Graph graph-file");
