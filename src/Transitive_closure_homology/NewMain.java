@@ -31,7 +31,7 @@ public class NewMain {
             //obj.compute_betti_nums();
         }
         obj.stream.finalizeStream();
-        System.out.println(obj.stream.toString());
+        //System.out.println(obj.stream.toString());
         obj.compute_betti_nums();
     }
 }

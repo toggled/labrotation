@@ -49,15 +49,16 @@ public class Iterative_trans_closure_random {
         //String filename = "../datasets/0 (copy).edges";
         //String filename = "../datasets/friends.txt";
         String filename = "../datasets/3437.edges";
-        //String filename = "../datasets/testcase_2.edges";
+       // String filename = "../datasets/testcase_2.edges";
         //String filename = "../datasets/newdata.edges";
             //String filename = "CA-GrQc.txt";
-        nodelimit = 80;
+        nodelimit = 50;
 		// TODO Auto-generated method stub
 		/*if(args.length != 1){
 			System.err.println("example command: java -cp ./ Graph graph-file");
 			return ;
 		}*/
+        
 		Iterative_trans_closure_random g = new Iterative_trans_closure_random(filename);
                 
         try {
@@ -183,41 +184,8 @@ public class Iterative_trans_closure_random {
 				ajacentMatrix[i][j] = 0; 
 			}
 		}
-		for(int i = 0; i < lines.size(); i++){
-			String[] tokens = lines.get(i).split(" ");
-			if(tokens.length != 2){
-				System.err.println("the format of each line/vertex: \"source-node-index target-node-index\"");
-				
-			}
-			int sourceNodeIndex = Integer.parseInt(tokens[0]);
-			int targetNodeIndex = Integer.parseInt(tokens[1]);
-                        //System.out.println(lines.get(i));
-                        
-                            ajacentMatrix[sourceNodeIndex ][targetNodeIndex ] = 1;
-                            ajacentMatrix[targetNodeIndex ][sourceNodeIndex ] = 1;
-                        if ( flag_file[sourceNodeIndex] == 0){ 
-                            flag_file[sourceNodeIndex] = 1;
-                            try {
-                                this.writer.write(tokens[0]+"\n");
-                            } catch (IOException ex) {
-                                Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                        if ( flag_file[targetNodeIndex] == 0){ 
-                            flag_file[targetNodeIndex] = 1;
-                            try {
-                                this.writer.write(tokens[1]+"\n");
-                            } catch (IOException ex) {
-                                Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    try {
-                        this.writer.write(tokens[0]+" "+tokens[1]+"\n");
-                    } catch (IOException ex) {
-                        Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-		}
-		//prune nodes and corresponding edges
+                
+                //prune nodes and corresponding edges
                 Random rng = new Random(); // Ideally just create one instance globally
                 // Note: use LinkedHashSet to maintain insertion order
                 Set<Integer> generated = new LinkedHashSet<Integer>();
@@ -229,6 +197,44 @@ public class Iterative_trans_closure_random {
                 }
                 //System.out.println("Set: "+generated.size());
                 
+		for(int i = 0; i < lines.size(); i++){
+			String[] tokens = lines.get(i).split(" ");
+			if(tokens.length != 2){
+				System.err.println("the format of each line/vertex: \"source-node-index target-node-index\"");
+				
+			}
+			int sourceNodeIndex = Integer.parseInt(tokens[0]);
+			int targetNodeIndex = Integer.parseInt(tokens[1]);
+                        //System.out.println(lines.get(i));
+                        //Don't add the edge if one of its vertices was selected for pruning
+                        if(generated.contains(sourceNodeIndex) || generated.contains(targetNodeIndex)) 
+                            continue;
+                        
+                        ajacentMatrix[sourceNodeIndex ][targetNodeIndex ] = 1;
+                        ajacentMatrix[targetNodeIndex ][sourceNodeIndex ] = 1;
+                        if ( flag_file[sourceNodeIndex] == 0){ 
+                            flag_file[sourceNodeIndex] = 1;
+                           try {
+                                this.writer.write(tokens[0]+"\n");
+                            } catch (IOException ex) {
+                                Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                        if ( flag_file[targetNodeIndex] == 0){ 
+                            flag_file[targetNodeIndex] = 1;
+                           try {
+                                this.writer.write(tokens[1]+"\n");
+                            } catch (IOException ex) {
+                                Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    try {
+                        this.writer.write(tokens[0]+" "+tokens[1]+"\n");
+                    } catch (IOException ex) {
+                        Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+		}
+
                 Iterator it = generated.iterator();
                 while(it.hasNext()){
                     int toprune = (int)it.next();

@@ -279,7 +279,8 @@ public class BasicHomology_triangulation_trans {
         } catch (IOException ex) {
             Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
         }
-        this.stream.finalizeStream();
+        //this.stream.finalizeStream();
+        
     }
     
     private void initialize_streamfromgraph(ExplicitSimplexStream stream, String simplicesout) {

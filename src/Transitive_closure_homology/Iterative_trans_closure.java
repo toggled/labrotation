@@ -43,8 +43,9 @@ public class Iterative_trans_closure {
         // TODO code application logic here
         //String filename = "../datasets/0 (copy).edges";
         //String filename = "../datasets/friends.txt";
-       // String filename = "../datasets/3980.edges";
+        //String filename = "../datasets/3437.edges";
         String filename = "../datasets/testcase_2.edges";
+        //String filename = "../datasets/newdata.edges";
             //String filename = "CA-GrQc.txt";
                  
 		// TODO Auto-generated method stub
