@@ -25,7 +25,7 @@ public class Iterative_trans_closure {
      */
     String graphFname = null;
 	private int vertexCount = 0;
-	private int ajacentMatrix[][] = null;
+	private boolean ajacentMatrix[][] = null;
 	private int degreeArray[] = null;
 	private int vertexCountWithSameDegree[] = null;
         File f = new File("cliques.out");
@@ -58,7 +58,8 @@ public class Iterative_trans_closure {
         try {
             if(!g.init())
                     return;
-            //g.printadjmat();
+            g.printadjmat();
+           
             g.compute_degre();
             g.getAllCliques();
             gwriter.write_graph(g.ajacentMatrix,graph_base_filename+g.k_closure+".edges","edgelist");
@@ -74,7 +75,7 @@ public class Iterative_trans_closure {
                     g.init_cliquewriter(g.k_closure);
                     g.getAllCliques();
                     System.out.println(g.k_closure +"-th closure:\n");
-                    //g.printadjmat();
+                    g.printadjmat();
                                        
             }
             g.gen_configfile();
@@ -137,7 +138,7 @@ public class Iterative_trans_closure {
 	}
     public void compute_transitive_closure(){
         stableflag = true;
-        int [][] copy_adjmat = new int[ajacentMatrix.length][];
+        boolean [][] copy_adjmat = new boolean[ajacentMatrix.length][];
             for(int i = 0; i < ajacentMatrix.length; i++)
                 copy_adjmat[i] = ajacentMatrix[i].clone();
         //this.printadjmat();
@@ -147,14 +148,14 @@ public class Iterative_trans_closure {
                 int sum = 0;
                 if(row!=col){
                     for (int row2 = 0; row2 < copy_adjmat[0].length; row2++) {
-
-                        sum += (copy_adjmat[row][row2]*copy_adjmat[row2][col]) ;
-
+                        if(copy_adjmat[row][row2] & copy_adjmat[row2][col]){
+                            sum ++;
+                        }
                     }
                 //System.out.print(sum+" ");
-                    if( sum > 0){
-                        if(ajacentMatrix[row][col]!=1){
-                            ajacentMatrix[row][col] = 1 ;
+                   if( sum > 0){
+                        if(!ajacentMatrix[row][col]){
+                            ajacentMatrix[row][col] = true ;
                             stableflag = false;
                             }
                     }
@@ -171,11 +172,11 @@ public class Iterative_trans_closure {
 	public void formadjacency_mat(Vector<String> lines,int vertexCount){
 
 		//initialize adjacent matrix
-                ajacentMatrix = new int[vertexCount][vertexCount];
+                ajacentMatrix = new boolean[vertexCount][vertexCount];
                 int[] flag_file = new int[vertexCount+1]; // flag for checking whether a vertex has been writen as simplex in the file or not
 		for(int i = 0; i < vertexCount; i++){
 			for(int j = 0; j < vertexCount; j++){
-				ajacentMatrix[i][j] = 0; 
+				ajacentMatrix[i][j] = false; 
 			}
 		}
 		for(int i = 0; i < lines.size(); i++){
@@ -188,8 +189,8 @@ public class Iterative_trans_closure {
 			int targetNodeIndex = Integer.parseInt(tokens[1]);
                         //System.out.println(lines.get(i));
                         
-                            ajacentMatrix[sourceNodeIndex ][targetNodeIndex ] = 1;
-                            ajacentMatrix[targetNodeIndex ][sourceNodeIndex ] = 1;
+                            ajacentMatrix[sourceNodeIndex ][targetNodeIndex ] = true;
+                            ajacentMatrix[targetNodeIndex ][sourceNodeIndex ] = true;
                         if ( flag_file[sourceNodeIndex] == 0){ 
                             flag_file[sourceNodeIndex] = 1;
                             try {
@@ -220,7 +221,7 @@ public class Iterative_trans_closure {
 		for(int i = 0; i < vertexCount; i++){
 			degreeArray[i] = 0;
 			for(int j = 0; j < vertexCount; j++){
-				if(ajacentMatrix[i][j] ==  1)
+				if(ajacentMatrix[i][j])
 					degreeArray[i]++;
 			}
 			//System.out.println(degreeArray[i]);
@@ -273,7 +274,7 @@ public class Iterative_trans_closure {
 				int currentVertex = candidateVertexes.get(i);
 				boolean connectedWithFrontVertexes = true;
 				for(int j = 0; j < index; j++){
-					if(ajacentMatrix[cliqueVertexes[j]][currentVertex] != 1){
+					if(!ajacentMatrix[cliqueVertexes[j]][currentVertex]){
 						connectedWithFrontVertexes = false;
 						break;
 					}
@@ -316,7 +317,10 @@ public class Iterative_trans_closure {
         private void printadjmat(){
             for (int i = 0; i < this.ajacentMatrix.length; i++) {
                 for (int j = 0; j < this.ajacentMatrix[0].length; j++) {
-                    System.out.print(ajacentMatrix[i][j]+" ");
+                    if(ajacentMatrix[i][j])
+                        System.out.print(1+" ");
+                    else
+                        System.out.print(0+" ");
                 }
                 System.out.println("");
             }
