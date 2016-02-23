@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Hashtable;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 
@@ -20,15 +21,27 @@ public class ReadFromFiles {
 			BufferedReader bufferedReader = new BufferedReader(read);
 			String lineTxt = null;
                         int id = 0; // internal representation of the vertex id's (starts from 1)
+                        String delem = " ";
 			while((lineTxt = bufferedReader.readLine()) != null){
-                            String[] tokens = lineTxt.split(" ");
-                            int sourceNodeIndex = Integer.parseInt(tokens[0]);
-                            int targetNodeIndex = Integer.parseInt(tokens[1]);
+                            if(id>= Integer.MAX_VALUE)  break; // Java cannot handle 2D array larger than 2^31-1
+                            String[] tokens = null;
+                            //  String[] tokens = lineTxt.split(" ");
+                            StringTokenizer st = new StringTokenizer(lineTxt, delem);
+                            //System.out.println(st.nextToken("\t"));
+                            //tokens[0] = st.nextToken("\t");
+                            //tokens[1] = st.nextToken("\t");
+                            //System.out.println(tokens[0]+" "+tokens[1]);
+                            int sourceNodeIndex = Integer.parseInt(st.nextToken(delem));
+                            //System.out.println(sourceNodeIndex);
+                            int targetNodeIndex = Integer.parseInt(st.nextToken(delem));
+                            //System.out.println(targetNodeIndex);
                             if(mapping.getOrDefault(sourceNodeIndex, -1) ==-1 ){
                                 mapping.put(sourceNodeIndex, id++);
+                                // mapping.put(sourceNodeIndex, sourceNodeIndex);
                             }
                             if(mapping.getOrDefault(targetNodeIndex, -1) ==-1 ){
                                 mapping.put(targetNodeIndex, id++);
+                                //mapping.put(targetNodeIndex, targetNodeIndex);
                             }
                             lines.add(new String(mapping.get(sourceNodeIndex)+" "+mapping.get(targetNodeIndex)));
                         }
