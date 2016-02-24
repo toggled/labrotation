@@ -48,6 +48,9 @@ public class Graph_writer {
             }
         }
     }
+    
+    // Use this function when you sample the graph, Since some of the nodes might be disconnected
+    // from others and adjacency matrix carry info about edges only.
     static void write_graph(boolean adj_mat[][],String filename,String option,int []nodelist){
         File fobj;
         FileWriter fwriterobj = null;
