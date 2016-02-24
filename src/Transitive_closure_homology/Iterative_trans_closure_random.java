@@ -46,6 +46,7 @@ public class Iterative_trans_closure_random {
     String clique_base_filename = "clique";
     static int nodelimit; //must be less than vertexcount
     int sampling_strategy = 1; // 0 = random node sampling, 1 = Random Walk Sampling
+    static int [] sampled_nodes;
     public static void main(String[] args) {
         // TODO code application logic here
         //String filename = "../datasets/0 (copy).edges";
@@ -56,7 +57,7 @@ public class Iterative_trans_closure_random {
         //String filename = "CA-GrQc.txt";
          String filename = "../Dexa-Paper Dataset/karate.edges";
         //String filename = "../Dexa-Paper Dataset/football.txt";
-        nodelimit = 5;
+        nodelimit = 25;
 
         Iterative_trans_closure_random g = new Iterative_trans_closure_random(filename);
 
@@ -67,7 +68,7 @@ public class Iterative_trans_closure_random {
             g.printadjmat();
             g.compute_degre();
             g.getAllCliques();
-            gwriter.write_graph(g.ajacentMatrix, graph_base_filename + g.k_closure + ".edges", "edgelist");
+            gwriter.write_graph(g.ajacentMatrix, graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
             for (;;) {
 
                 g.compute_transitive_closure();
@@ -76,7 +77,7 @@ public class Iterative_trans_closure_random {
                 }
 
                 g.k_closure++;
-                gwriter.write_graph(g.ajacentMatrix, graph_base_filename + g.k_closure + ".edges", "edgelist");
+                gwriter.write_graph(g.ajacentMatrix, graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
                 g.compute_degre(); // compute degree each time before you run cliqe algorithm
                 g.init_cliquewriter(g.k_closure);
                 g.getAllCliques();
@@ -295,7 +296,7 @@ public class Iterative_trans_closure_random {
         int steps = 0;
         int current_node;
         double jumpingprob = 0.15;
-        int [] sampled_nodes = new int[nodelimit];
+        sampled_nodes = new int[nodelimit];
         
         while(num_nodes_visited < nodelimit  ){
             current_node = source;
@@ -325,7 +326,7 @@ public class Iterative_trans_closure_random {
                 this.writer.write(String.valueOf(sampled_nodes[i])+"\n");
                 for(int j = i+1; j<nodelimit;j++){
                     if(randomwalk_matrix[sampled_nodes[i]][sampled_nodes[j]]==false){
-                        System.out.println(i+" " +j+"\n");
+                        //System.out.println(i+" " +j+"\n");
                     }
                     else{
                     ajacentMatrix[sampled_nodes[j]][sampled_nodes[i]] = ajacentMatrix[sampled_nodes[i]][sampled_nodes[j]] = randomwalk_matrix[sampled_nodes[i]][sampled_nodes[j]];
