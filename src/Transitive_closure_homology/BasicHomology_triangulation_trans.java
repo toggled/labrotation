@@ -156,14 +156,14 @@ public class BasicHomology_triangulation_trans {
                 }
                 if(tokens.length == 1){
                     stream.addVertex(Integer.valueOf(tokens[0]),kclosure-1); // when we add 0-simplex or clique of size 1
-                    System.out.println(tokens[0]);
+                    //System.out.println(tokens[0]);
                 }
                 else 
                     stream.addElement(elem,kclosure-1);
-                    for (int i = 0; i < elem.length; i++) {
+                   /* for (int i = 0; i < elem.length; i++) {
                             System.out.print(elem[i]+" ");
                         }
-                        System.out.println("");
+                        System.out.println("");*/
                 //System.out.println("hk: "+(kclosure-1));
             }
             System.out.println("stream size: "+stream.getSize());
@@ -225,11 +225,11 @@ public class BasicHomology_triangulation_trans {
         BarcodeCollection<Double> circle_intervals
                 = persistence.computeIntervals(this.stream); // computing betti intervals
         
-        //System.out.println(circle_intervals); // printing betti intervals
+        System.out.println(circle_intervals); // printing betti intervals
         System.out.println(circle_intervals.getBettiNumbers());
         generate_barcode_image(circle_intervals,maxdimension);
         generate_representative_cycle(this.stream,persistence,circle_intervals);
-        System.out.println(stream.validateVerbose());
+        //System.out.println(stream.validateVerbose());
     }
     void add_to_stream(String simplicesfile,int k){
         System.out.println("Adding from: "+simplicesfile);
@@ -253,22 +253,22 @@ public class BasicHomology_triangulation_trans {
                 if(tokens.length == 1){
                     if(!this.stream.containsElement(new Simplex(elem)))
                         this.stream.addVertex(Integer.valueOf(tokens[0]),k-1); // when we add 0-simplex or clique of size 1
-                    System.out.println(tokens[0]);
+                    //System.out.println(tokens[0]);
                 }
                 else{ 
                     if(!this.stream.containsElement(new Simplex(elem))){
-                        for (int i = 0; i < elem.length; i++) {
+                        /*for (int i = 0; i < elem.length; i++) {
                             System.out.print(elem[i]+" ");
                         }
-                        System.out.println("");
+                        System.out.println("");*/
                         this.stream.addElement(elem,k-1);
                     }
                     else{
-                        System.out.print("already exists: ");
-                        for (int i = 0; i < elem.length; i++) {
+                       // System.out.print("already exists: ");
+                       /* for (int i = 0; i < elem.length; i++) {
                             System.out.print(elem[i]+" ");
                         }
-                        System.out.println("");
+                        System.out.println("");*/
                     }
                 }
             }
