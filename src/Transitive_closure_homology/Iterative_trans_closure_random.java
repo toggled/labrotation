@@ -11,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
@@ -45,30 +44,49 @@ public class Iterative_trans_closure_random {
     static String graph_base_filename = "graph";
     String clique_base_filename = "clique";
     static int nodelimit; //must be less than vertexcount
-    int sampling_strategy = 1; // 0 = random node sampling, 1 = Random Walk Sampling
+    static int sampling_strategy; // 0 = random node sampling, 1 = Random Walk Sampling
     static int [] sampled_nodes;
+    static int seed;
+    static String filename,Directory_name,working_dir,fullpath_output;
+    static void run_configs(){
+        sampling_strategy = 1;
+        nodelimit = 25;
+        seed = 43; // just using some number
+        // filename = "../datasets/0 (copy).edges";
+        // filename = "../datasets/friends.txt";
+        //  filename = "../datasets/3437.edges";
+        // filename = "../datasets/testcase_2.edges";
+        // filename = "../datasets/newdata.edges";
+        // filename = "CA-GrQc.txt";
+          filename = "../Dexa-Paper Dataset/karate.edges";
+        // filename = "../Dexa-Paper Dataset/football.txt";
+          parsefilename();
+    }
+    static void parsefilename(){
+        String[] segs = filename.split("/");
+        String[] dotseg = segs[segs.length-1].split("\\.");
+        Directory_name = dotseg[0]+"_"+String.valueOf(seed);
+        //System.out.println(Directory_name);
+        working_dir = System.getProperty("user.dir");
+        fullpath_output = working_dir+"/"+Directory_name+"/";
+        //System.exit(1);
+    }
     public static void main(String[] args) {
         // TODO code application logic here
-        //String filename = "../datasets/0 (copy).edges";
-        //String filename = "../datasets/friends.txt";
-        // String filename = "../datasets/3437.edges";
-        //String filename = "../datasets/testcase_2.edges";
-        //String filename = "../datasets/newdata.edges";
-        //String filename = "CA-GrQc.txt";
-         String filename = "../Dexa-Paper Dataset/karate.edges";
-        //String filename = "../Dexa-Paper Dataset/football.txt";
-        nodelimit = 25;
+
+        
+        run_configs();
 
         Iterative_trans_closure_random g = new Iterative_trans_closure_random(filename);
-
+        // taking closure and computing cliques
         try {
             if (!g.init()) {
                 return;
             }
-            g.printadjmat();
+            //g.printadjmat();
             g.compute_degre();
             g.getAllCliques();
-            gwriter.write_graph(g.ajacentMatrix, graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
+            gwriter.write_graph(g.ajacentMatrix, fullpath_output+graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
             for (;;) {
 
                 g.compute_transitive_closure();
@@ -77,18 +95,21 @@ public class Iterative_trans_closure_random {
                 }
 
                 g.k_closure++;
-                gwriter.write_graph(g.ajacentMatrix, graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
+                gwriter.write_graph(g.ajacentMatrix, fullpath_output+graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
                 g.compute_degre(); // compute degree each time before you run cliqe algorithm
                 g.init_cliquewriter(g.k_closure);
                 g.getAllCliques();
                 System.out.println(g.k_closure + "-th closure:\n");
-                    //g.printadjmat();
+                //g.printadjmat();
 
             }
-            g.gen_configfile();
+            g.gen_configfile(); // generate config file to be used for constructing persistence of clique complex
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
         }
+        // Construct Clique complex and compute barcodes.
+         Barcode_Computer barcomp = new Barcode_Computer();
+         barcomp.runpersistence_algo();
     }
 
     public Iterative_trans_closure_random(String fname) {
@@ -290,7 +311,7 @@ public class Iterative_trans_closure_random {
         }
         // Do the walk (with prob .15 restart from the same source) and fill up the original adjacency matrix
         // do 100*n steps before changing your source and do rw again. Ref:(Sampling from large graph: by Jure leskovec)
-        Random random = new Random(vertexCount+vertexCount%13);
+        Random random = new Random(seed+vertexCount%13); // setting seed based on global seed and vertexcount.
         int source = random.nextInt(vertexCount);
         int num_nodes_visited = 0;
         int steps = 0;
@@ -467,9 +488,24 @@ public class Iterative_trans_closure_random {
         try {
             //this.fos = new FileOutputStream(this.f);
             //this.bw = new BufferedWriter(new OutputStreamWriter(this.fos));
-            this.f = new File(clique_base_filename + "_" + k + ".out");
-            this.fileWriter = new FileWriter(f);
-            this.writer = new BufferedWriter(fileWriter);
+            File dir = new File(fullpath_output);
+            if(dir.exists()){
+                this.f = new File(fullpath_output+ clique_base_filename + "_" + k + ".out");
+                this.fileWriter = new FileWriter(f);
+                this.writer = new BufferedWriter(fileWriter);
+            }
+            else{
+                // attempt to create the directory here
+                if (dir.mkdir()){
+                    this.f = new File(fullpath_output+ clique_base_filename + "_" + k + ".out");
+                    this.fileWriter = new FileWriter(f);
+                    this.writer = new BufferedWriter(fileWriter);
+                }
+                else{
+                    System.out.println("Cannot create output directory! Exiting.. \n");
+                    System.exit(1);
+                }
+            }
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -487,6 +523,7 @@ public class Iterative_trans_closure_random {
 
             bw.write("maxclosure=" + String.valueOf(this.k_closure) + "\n");
             bw.write("graphfile=" + graph_base_filename + "\n");
+            bw.write("outputdir="+fullpath_output);
         } catch (IOException ex) {
             Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
         } finally {

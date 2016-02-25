@@ -33,6 +33,7 @@ public class BasicHomology_triangulation_trans {
     ExplicitSimplexStream stream;
     int maxdimension;
     int kclosure;
+    String outputdir_path;
     public BasicHomology_triangulation_trans() {
         this.read_clique_config();  
     }
@@ -45,7 +46,7 @@ public class BasicHomology_triangulation_trans {
             interv = circle_intervals.getIntervalsAtDimension(i);
             try {
                 im = BarcodeVisualizer.drawBarcode(interv, "dimension: " + i, this.maxdimension); // last argument maximum limit of bar interval
-                File outputfile = new File(clique_base_filename + i + "_barcode.png");
+                File outputfile = new File(outputdir_path+clique_base_filename + i + "_barcode.png");
                 ImageIO.write(im, "png", outputfile);
             } catch (IOException ex) {
                 Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
@@ -67,7 +68,7 @@ public class BasicHomology_triangulation_trans {
         AbstractPersistenceBasisAlgorithm abs = (AbstractPersistenceBasisAlgorithm) persistence;
         //System.out.println(abs.computeAnnotatedIntervals(stream));
         // Write them to a file
-        File f = new File(kclosure+"homology"+".out");
+        File f = new File(outputdir_path+kclosure+"homology"+".out");
         FileOutputStream fos;
         BufferedWriter bw;
         
@@ -189,16 +190,25 @@ public class BasicHomology_triangulation_trans {
         BufferedReader br = new BufferedReader(fr);
         try {
             // Reading the cliqeu base file name
-            String option = br.readLine();
-            StringTokenizer st  = new StringTokenizer(option,"=");
-            st.nextToken();
-            this.clique_base_filename  = st.nextToken();
-            
-            //Reading maxclosure
-             option = br.readLine();
-             st  = new StringTokenizer(option,"=");
-             st.nextToken();
-             this.max_closure  = Integer.valueOf(st.nextToken());
+            for(int i=1;i<=4;i++){
+                String option = br.readLine();
+                StringTokenizer st  = new StringTokenizer(option,"=");
+                st.nextToken();
+                switch(i){
+                        case 1:                        
+                            this.clique_base_filename  = st.nextToken(); // first line is cliqe file prefix
+                            break;
+                        case 2:
+                            //Reading maxclosure
+                            this.max_closure  = Integer.valueOf(st.nextToken());
+                            break;
+                        case 3: // graph prefix is not needed here
+                            break;
+                        case 4:
+                            outputdir_path = st.nextToken();
+                            break;
+                }
+            }
         } catch (IOException ex) {
             Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -210,7 +220,7 @@ public class BasicHomology_triangulation_trans {
         ExplicitSimplexStream stream = new ExplicitSimplexStream();
         //for(int i = 1;i<=kth_closure;i++)
         //initialize_streamfromgraph(stream,"graph"+kth_closure+".edges"); //for the tomita version
-        addhigherelement(stream,this.clique_base_filename+"_"+kth_closure+".out");
+        addhigherelement(stream,outputdir_path+this.clique_base_filename+"_"+kth_closure+".out");
         stream.finalizeStream();
         this.maxdimension = max_closure;
          return stream;
