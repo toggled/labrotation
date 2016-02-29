@@ -22,11 +22,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import javax.imageio.ImageIO;
 import jplex_explore.AdjMatrixGraph;
+import java.util.regex.*;
+
 public class BasicHomology_triangulation_trans {
     String clique_base_filename;
     static int max_closure;
@@ -34,6 +37,8 @@ public class BasicHomology_triangulation_trans {
     int maxdimension;
     int kclosure;
     String outputdir_path;
+    List <String> dim_birth_dataarray;
+    
     public BasicHomology_triangulation_trans() {
         this.read_clique_config();  
     }
@@ -71,6 +76,7 @@ public class BasicHomology_triangulation_trans {
         File f = new File(outputdir_path+kclosure+"homology"+".out");
         FileOutputStream fos;
         BufferedWriter bw;
+        dim_birth_dataarray = new ArrayList<String>(); // instantiate the list to store dim,birth,death
         
         try {
             fos = new FileOutputStream(f);
@@ -78,10 +84,12 @@ public class BasicHomology_triangulation_trans {
             AnnotatedBarcodeCollection it = abs.computeAnnotatedIntervals(stream);
             //System.out.println(it);
             Iterator itt = it.getIntervalIterator();
-          
+            
+            
             while(itt.hasNext()){
                 String s = itt.next().toString();
                 try {
+                    Store_birthanddate(s);
                     bw.write(s);
                     bw.newLine();
                 } catch (IOException ex) {
@@ -89,8 +97,29 @@ public class BasicHomology_triangulation_trans {
                 }
                
             }
+            /*
+            I am going to write the birth and death arraylist into disk
+            */
+            File fbirdeath = new File(outputdir_path+kclosure+"homology"+".bd");
+             FileOutputStream fos_bd = new FileOutputStream(fbirdeath);
+            BufferedWriter bw_bd = new BufferedWriter(new OutputStreamWriter(fos_bd));
+            for (Iterator<String> iterator = dim_birth_dataarray.iterator(); iterator.hasNext();) {
+                String next = iterator.next();
+                try {
+                    bw_bd.write(next);
+                     bw_bd.newLine();
+                } catch (IOException ex) {
+                    Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+                }
+               
+            }
+            try {
+                bw_bd.close();
+            } catch (IOException ex) {
+                Logger.getLogger(BasicHomology_triangulation_trans.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
-             itt = it.getGeneratorIterator();
+            itt = it.getGeneratorIterator();
             while(itt.hasNext()){
                 String s = itt.next().toString();
                 try {
@@ -236,7 +265,7 @@ public class BasicHomology_triangulation_trans {
                 = persistence.computeIntervals(this.stream); // computing betti intervals
         
         System.out.println(circle_intervals); // printing betti intervals
-        System.out.println(circle_intervals.getBettiNumbers());
+        System.out.println("Betti numbers: "+circle_intervals.getBettiNumbers());
         generate_barcode_image(circle_intervals,maxdimension);
         generate_representative_cycle(this.stream,persistence,circle_intervals);
         //System.out.println(stream.validateVerbose());
@@ -334,6 +363,35 @@ public class BasicHomology_triangulation_trans {
         
         
          
+    }
+
+    private void Store_birthanddate(String s) {
+        /*
+        Returns a List for instance [0,[a,b),[c,d)] or [1,[x,y)] . 
+        The first item is always the dimension of the complex and 
+        next the birth and death intervals of the simplices on that dimension.        
+        */
+        
+        double birth,data;
+        StringTokenizer st = new StringTokenizer(s, "=");
+        String dim = st.nextToken().trim();
+        String pattern = "\\[(.*?)\\]";
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(s);
+        
+        
+        int i=0;
+        while(m.find()){
+            String the_interval_asstring = m.group().substring(2, m.group().length()-2);
+            
+            String birth_death_ar[] = the_interval_asstring.split(",");
+            if(birth_death_ar[1].trim().equals("infinity"))
+                birth_death_ar[1] = String.valueOf((double)maxdimension);
+            dim_birth_dataarray.add(dim+" "+birth_death_ar[0].trim()+" "+birth_death_ar[1].trim());
+            //System.out.println("match found: "+m.group().substring(2, m.group().length()-2));
+           // System.out.println(dim+" "+birth_death_ar[0].trim()+" "+birth_death_ar[1].trim());
+        }
+       
     }
 
 
