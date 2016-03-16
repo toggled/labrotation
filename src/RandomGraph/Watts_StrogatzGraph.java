@@ -11,7 +11,7 @@ import java.util.Random;
  *
  * @author naheed
  */
-class Watts_StrogatzGraph extends Graph implements RandomGraph {
+public class Watts_StrogatzGraph extends Graph implements RandomGraph {
     int num_nodes,averagedegree;
     double rewiringprob;
     public Watts_StrogatzGraph(Parameter graph_parameters) {

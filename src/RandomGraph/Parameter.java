@@ -16,10 +16,10 @@ public class Parameter {
     public Parameter() {
         param = new HashMap<>();
     }
-    void put(String key, Object val){
+    public void put(String key, Object val){
         param.put(key, val);
     }
-    Object get(String key){
+    public Object get(String key){
         return param.get(key);
     }
 }
