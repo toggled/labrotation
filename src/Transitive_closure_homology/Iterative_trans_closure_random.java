@@ -5,12 +5,16 @@
  */
 package Transitive_closure_homology;
 
+import edu.stanford.math.plex4.homology.barcodes.AnnotatedBarcodeCollection;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +28,31 @@ import java.util.logging.Logger;
  * @author naheed
  */
 public class Iterative_trans_closure_random {
+
+    private static void AppendBottleneckdistance() {
+        try {
+            File f  = new File("bottleneckpaths.txt");
+            if(!f.exists())
+                f.createNewFile();
+            FileOutputStream fos_bd;
+            BufferedWriter bw_bd = null;
+                fos_bd = new FileOutputStream(f,true);
+                bw_bd = new BufferedWriter(new OutputStreamWriter(fos_bd));
+ 
+            for (Iterator<String> iterator = bottleneckdistance_path.iterator(); iterator.hasNext();) {
+                String next = iterator.next();
+                    bw_bd.write(next);
+                    bw_bd.newLine();
+            }
+         
+            bw_bd.close();
+          
+
+        } catch (IOException ex) {
+            Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
+        }
+ 
+    }
 
     /**
      * @param args the command line arguments
@@ -48,18 +77,25 @@ public class Iterative_trans_closure_random {
     static int [] sampled_nodes;
     static int seed;
     static String filename,Directory_name,working_dir,fullpath_output;
-    static void run_configs(){
-        sampling_strategy = 1;
-        nodelimit = 25;
-        seed = 43; // just using some number
+    //static int[] seedar = {7,13,23,29,11};
+    static int[] seedar = {10101023};
+    static int seedid=0;
+    static ArrayList<String> bottleneckdistance_path = new ArrayList<>() ; // I write all the bottleneck distances files path into a file so that R can access them.
+    static ArrayList<AnnotatedBarcodeCollection > bottlenecklist = new ArrayList<>();
+    static void run_configs(){      
+        sampling_strategy = 0; 
+        nodelimit = 1000; // Number of nodes randomly sampled
+        //seed = seedar[new Random().nextInt(seedar.length)]; // just using some number
+        seed = seedar[seedid++];
         // filename = "../datasets/0 (copy).edges";
         // filename = "../datasets/friends.txt";
-        //  filename = "../datasets/3437.edges";
-        // filename = "../datasets/testcase_2.edges";
+        //filename = "../datasets/testcase_2.edges";
         // filename = "../datasets/newdata.edges";
         // filename = "CA-GrQc.txt";
-          filename = "../Dexa-Paper Dataset/karate.edges";
-        // filename = "../Dexa-Paper Dataset/football.txt";
+        //filename = "../Dexa-Paper Dataset/karate.edges"; //zachary's karate club
+        // filename = "../Dexa-Paper Dataset/football.edges"; // american football 
+        filename = "../Dexa-Paper Dataset/netscience.txt"; // collaboration network of scientists from network science 
+                 //filename = "../datasets/1912.edges"; // facebook graph of friends
           parsefilename();
     }
     static void parsefilename(){
@@ -69,47 +105,48 @@ public class Iterative_trans_closure_random {
         //System.out.println(Directory_name);
         working_dir = System.getProperty("user.dir");
         fullpath_output = working_dir+"/"+Directory_name+"/";
-        //System.exit(1);
     }
     public static void main(String[] args) {
         // TODO code application logic here
 
-        
-        run_configs();
+        for(int i =0;i<seedar.length;i++){
+            run_configs();
 
-        Iterative_trans_closure_random g = new Iterative_trans_closure_random(filename);
-        // taking closure and computing cliques
-        try {
-            if (!g.init()) {
-                return;
-            }
-            //g.printadjmat();
-            g.compute_degre();
-            g.getAllCliques();
-            gwriter.write_graph(g.ajacentMatrix, fullpath_output+graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
-            for (;;) {
-
-                g.compute_transitive_closure();
-                if (g.stableflag) {
-                    break;
+            Iterative_trans_closure_random g = new Iterative_trans_closure_random(filename);
+            // taking closure and computing cliques
+            try {
+                if (!g.init()) {
+                    return;
                 }
-
-                g.k_closure++;
-                gwriter.write_graph(g.ajacentMatrix, fullpath_output+graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
-                g.compute_degre(); // compute degree each time before you run cliqe algorithm
-                g.init_cliquewriter(g.k_closure);
-                g.getAllCliques();
-                System.out.println(g.k_closure + "-th closure:\n");
                 //g.printadjmat();
+                g.compute_degre();
+                g.getAllCliques();
+                gwriter.write_graph(g.ajacentMatrix, fullpath_output+graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
+                for (;;) {
 
+                    g.compute_transitive_closure();
+                    if (g.stableflag) {
+                        break;
+                    }
+
+                    g.k_closure++;
+                    gwriter.write_graph(g.ajacentMatrix, fullpath_output+graph_base_filename + g.k_closure + ".edges", "edgelist",sampled_nodes);
+                    g.compute_degre(); // compute degree each time before you run cliqe algorithm
+                    g.init_cliquewriter(g.k_closure);
+                    g.getAllCliques();
+                    System.out.println(g.k_closure + "-th closure:\n");
+                    //g.printadjmat();
+
+                }
+               // g.gen_configfile(); // generate config file to be used for constructing persistence of clique complex
+            } catch (IOException ex) {
+                Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
             }
-            g.gen_configfile(); // generate config file to be used for constructing persistence of clique complex
-        } catch (IOException ex) {
-            Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
+            // Construct Clique complex and compute barcodes.
+            // Barcode_Computer barcomp = new Barcode_Computer();
+            // barcomp.runpersistence_algo();
         }
-        // Construct Clique complex and compute barcodes.
-         Barcode_Computer barcomp = new Barcode_Computer();
-         barcomp.runpersistence_algo();
+        //AppendBottleneckdistance();
     }
 
     public Iterative_trans_closure_random(String fname) {
@@ -204,8 +241,13 @@ public class Iterative_trans_closure_random {
        //this.printadjmat();
         // System.exit(1);
     }
-
+    
+     // BUG in this function
     public void formadjacency_mat(Vector<String> lines, int vertexCount) {
+        if (nodelimit == -1) {
+            nodelimit = vertexCount;
+        }
+        sampled_nodes = new int[nodelimit];
                //System.out.println("vertexcount: "+vertexCount*vertexCount+" maxint "+Integer.MAX_VALUE);
         //System.out.println(vertexCount*vertexCount>Integer.MAX_VALUE);
         Random randm = new Random();
@@ -223,17 +265,18 @@ public class Iterative_trans_closure_random {
         Random rng = new Random(); // Ideally just create one instance globally
         // Note: use LinkedHashSet to maintain insertion order
         Set<Integer> generated = new LinkedHashSet<>();
-        if (nodelimit == -1) {
-            nodelimit = vertexCount;
-        }
+
         while (generated.size() < vertexCount - nodelimit) {
             Integer next = rng.nextInt(vertexCount);
             // As we're adding to a set, this will automatically do a containment check
             generated.add(next);
         }
+        
         //System.out.println("Set: "+generated.size());
+        int count=0;
         for (String line : lines) {
             String[] tokens = line.split(" ");
+            System.out.println(line);
             if (tokens.length != 2) {
                 System.err.println("the format of each line/vertex: \"source-node-index target-node-index\"");
 
@@ -242,32 +285,35 @@ public class Iterative_trans_closure_random {
             int targetNodeIndex = Integer.parseInt(tokens[1]);
             //System.out.println(lines.get(i));
             //Don't add the edge if one of its vertices was selected for pruning
-            if (generated.contains(sourceNodeIndex) || generated.contains(targetNodeIndex)) {
-                continue;
+            
+            if (!generated.contains(sourceNodeIndex) && !generated.contains(targetNodeIndex)) {
+                ajacentMatrix[sourceNodeIndex][targetNodeIndex] = true;
+                ajacentMatrix[targetNodeIndex][sourceNodeIndex] = true;
             }
-            ajacentMatrix[sourceNodeIndex][targetNodeIndex] = true;
-            ajacentMatrix[targetNodeIndex][sourceNodeIndex] = true;
-            if (!flag_file[sourceNodeIndex]) {
+            if (!flag_file[sourceNodeIndex] && !generated.contains(sourceNodeIndex)) {
                 flag_file[sourceNodeIndex] = true;
                 try {
+                    sampled_nodes[count++] = sourceNodeIndex;
                     this.writer.write(tokens[0] + "\n");
                 } catch (IOException ex) {
                     Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            if (!flag_file[targetNodeIndex]) {
+            if (!flag_file[targetNodeIndex] && !generated.contains(targetNodeIndex)) {
                 flag_file[targetNodeIndex] = true;
                 try {
                     this.writer.write(tokens[1] + "\n");
+                    sampled_nodes[count++] = targetNodeIndex;
                 } catch (IOException ex) {
                     Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            try {
+            // Comment this out to avoid redundant edge write in clique1.edges
+            /*try {
                 this.writer.write(tokens[0] + " " + tokens[1] + "\n");
             } catch (IOException ex) {
                 Logger.getLogger(Iterative_trans_closure_random.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
         }
 
         for (int toprune : generated) {
@@ -311,7 +357,8 @@ public class Iterative_trans_closure_random {
         }
         // Do the walk (with prob .15 restart from the same source) and fill up the original adjacency matrix
         // do 100*n steps before changing your source and do rw again. Ref:(Sampling from large graph: by Jure leskovec)
-        Random random = new Random(seed+vertexCount%13); // setting seed based on global seed and vertexcount.
+       // Random random = new Random(seed); // setting seed based on global seed and vertexcount.
+        Random random = new Random(seed+vertexCount%13);
         int source = random.nextInt(vertexCount);
         int num_nodes_visited = 0;
         int steps = 0;
