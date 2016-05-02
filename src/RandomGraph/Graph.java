@@ -12,21 +12,25 @@ package RandomGraph;
 public class Graph {
     public int [][] adjmat;
     public int [] deg;
+    int numedges;
     public Graph() {
     }
     public void initialize_graph(int N){
         adjmat = new int[N][N];
         deg = new int[N];
+        numedges = 0;
     }
     public void add_edges(int u,int v){
         adjmat[u][v] = adjmat[v][u] = 1;
         deg[u]++;
         deg[v]++;
+        numedges++;
     }
     public void remove_edges(int u,int v){
         adjmat[u][v] = adjmat[v][u] = 0;
         deg[u]--;
         deg[v]--;
+        numedges--;
     }
     public int get_degree(int u){
         return deg[u];
