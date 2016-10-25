@@ -12,4 +12,5 @@ package RandomGraph;
 public interface RandomGraph {
     
     public Graph generate();  
+    public String getGraphParam(String param_key);
 }

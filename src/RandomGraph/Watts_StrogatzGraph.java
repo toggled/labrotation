@@ -14,15 +14,20 @@ import java.util.Random;
 public class Watts_StrogatzGraph extends Graph implements RandomGraph {
     int num_nodes,averagedegree;
     double rewiringprob;
+    int num_edges;
     public Watts_StrogatzGraph(Parameter graph_parameters) {
 
         num_nodes = (Integer) graph_parameters.get("N");
         averagedegree = (Integer) graph_parameters.get("D");
         rewiringprob = (Double) graph_parameters.get("p");
+        num_edges = (num_nodes*averagedegree)/2;
         //System.out.println("N: "+num_nodes+" D: "+averagedegree+" p: "+rewiringprob);
     }
 
-   
+    @Override
+   public String toString(){
+       return "Watts_Strogatz_"+String.valueOf(this.num_nodes)+"_"+String.valueOf(this.num_edges);
+   }
 
     @Override
     public Graph generate() {
@@ -55,6 +60,12 @@ public class Watts_StrogatzGraph extends Graph implements RandomGraph {
         //System.out.println("\n");
         //this.print_matrix();
         return this;
+    }
+
+    @Override
+    public String getGraphParam(String key) {
+        if (key.equals("N")) return String.valueOf(num_nodes);
+        return "Missing Param";
     }
 
 }

@@ -23,6 +23,9 @@ public class Barabasi_AlbertGraph extends Graph implements RandomGraph {
         
         System.out.println("N: "+num_nodes+" m: "+degree_pernode);
     }
+    public String get_name(){
+        return "Bar-Albert_"+String.valueOf(this.num_nodes)+"_"+String.valueOf(this.numedges);
+    }
     @Override
     public Graph generate() {
         
@@ -69,6 +72,11 @@ public class Barabasi_AlbertGraph extends Graph implements RandomGraph {
         }
         
         return this;
+    }
+
+    @Override
+    public String getGraphParam(String param_key) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

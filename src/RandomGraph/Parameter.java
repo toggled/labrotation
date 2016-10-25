@@ -22,4 +22,7 @@ public class Parameter {
     public Object get(String key){
         return param.get(key);
     }
+    public String toString(){
+        return param.get("name")+" "+param.get("N");
+    }
 }
