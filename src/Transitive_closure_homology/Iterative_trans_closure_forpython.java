@@ -121,8 +121,8 @@ public class Iterative_trans_closure_forpython {
 //
     
     public static void main(String[] args) {
-        int []numnodesar  = {25,50,75,100,125,150,175,200};
-        int [] degar = {2,3,4,5,6};
+        int []numnodesar  = {25,50,75};
+        int [] degar = {2,3,4};
         for (int N:numnodesar){
             System.out.println("Nodes: "+N);
             for(int D:degar){
@@ -235,7 +235,7 @@ public class Iterative_trans_closure_forpython {
                 filename_bb = "graph1.edges";
                 String working_dir = System.getProperty("user.dir");
                 String seed_randomdirname = null;
-              System.out.println(working_dir);
+              //System.out.println(working_dir);
 
                 if (!FileFolder.CreateFolderifnotexists(working_dir, foldername)) {
                     System.out.println("Couldn't create output directory");
@@ -258,20 +258,19 @@ public class Iterative_trans_closure_forpython {
                 }
             
 
-            String prefix = working_dir + "/" + foldername + "/" + seed_randomdirname; // american football 
+            //String prefix = working_dir + "/" + foldername + "/" + seed_randomdirname; // american football 
+            String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/barabasi-albert";
             File dir = new File(prefix);
             File[] filesList = dir.listFiles();
             
             //ArrayList <Tuple> Allintervals = new ArrayList<Tuple>();
             for (File file : filesList) {
                 
-                filename = file.toString();
+                filename = file.toString()+"/"+filename_bb;
                 
                 File graphfile = new File(filename);
-                System.out.println(filename);
+                //System.out.println(filename);
                 if (graphfile.exists()) {
-                    
-                    System.exit(1);
                     parsefilename();
                     Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
 
@@ -350,7 +349,7 @@ public class Iterative_trans_closure_forpython {
                 }
 
                 randgr = new Watts_StrogatzGraph(params).generate();
-                System.out.println(randgr.toString());
+                //System.out.println(randgr.toString());
 
                 if (randgr != null) {
                     randgr.write_graph(working_dir + "/" + foldername + "/" + seed_randomdirname + "/" + filename_bb);
@@ -359,7 +358,8 @@ public class Iterative_trans_closure_forpython {
                 }
             }
 
-            String prefix = "/home/naheed/NetBeansProjects/structural_holeTDA/watts-strogatz"; // american football 
+            //String prefix = "/home/naheed/NetBeansProjects/structural_holeTDA/watts-strogatz"; // american football 
+            String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/watts-strogatz";
             File dir = new File(prefix);
             File[] filesList = dir.listFiles();
             //ArrayList <Tuple> Allintervals = new ArrayList<Tuple>();
@@ -501,7 +501,7 @@ public class Iterative_trans_closure_forpython {
         //vertexCount = Integer.parseInt(lines.get(0));
 
         vertexCount = reader.getVertexCount();
-        System.out.println(vertexCount);
+        //System.out.println(vertexCount);
         formadjacency_mat(lines, vertexCount);
         //compute_degre();
         return true;
