@@ -27,6 +27,8 @@ public class ReadFromFiles {
                             String[] tokens = null;
                             //  String[] tokens = lineTxt.split(" ");
                             StringTokenizer st = new StringTokenizer(lineTxt, delem);
+                            if(st.countTokens()<2)
+                                continue;
                             //System.out.println(st.nextToken("\t"));
                             //tokens[0] = st.nextToken("\t");
                             //tokens[1] = st.nextToken("\t");
@@ -36,13 +38,18 @@ public class ReadFromFiles {
                             int targetNodeIndex = Integer.parseInt(st.nextToken(delem));
                             //System.out.println(targetNodeIndex);
                             if(mapping.getOrDefault(sourceNodeIndex, -1) ==-1 ){
+                                if (id == 915) System.out.println(sourceNodeIndex);
                                 mapping.put(sourceNodeIndex, id++);
-                                // mapping.put(sourceNodeIndex, sourceNodeIndex);
+                                //mapping.put(sourceNodeIndex, sourceNodeIndex);
+                                
                             }
                             if(mapping.getOrDefault(targetNodeIndex, -1) ==-1 ){
+                                if (id == 915) System.out.println(targetNodeIndex);
                                 mapping.put(targetNodeIndex, id++);
                                 //mapping.put(targetNodeIndex, targetNodeIndex);
+                                
                             }
+                            
                             lines.add(new String(mapping.get(sourceNodeIndex)+" "+mapping.get(targetNodeIndex)));
                         }
 			read.close();

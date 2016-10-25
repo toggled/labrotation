@@ -5,14 +5,26 @@
  */
 package Transitive_closure_homology;
 
+import RandomGraph.Barabasi_AlbertGraph;
+import RandomGraph.Graph;
+import RandomGraph.Parameter;
+import RandomGraph.Watts_StrogatzGraph;
+import Util.FileFolder;
+import Util.Tuple;
+import edu.stanford.math.plex4.homology.barcodes.Interval;
+import edu.stanford.math.plex4.bottleneck.BottleneckDistance;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 /**
  *
@@ -39,61 +51,413 @@ public class Iterative_trans_closure_forpython {
     static String graph_base_filename = "graph";
     String clique_base_filename = "pclique";
     static String filename, Directory_name, working_dir, fullpath_output;
-    static int[]  nodelist;
+    static int[] nodelist;
+    int maxclique = 3;
+    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_barb = new ArrayList<>();
+    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_barb = new ArrayList<>();
+    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_ws = new ArrayList<>();
+    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_ws = new ArrayList<>();
+    
+//    public static void main(String[] args) {
+//        // TODO code application logic here
+//        // filename = "../datasets/0 (copy).edges";
+//        // filename = "../datasets/friends.txt";
+//        //filename = "../datasets/3437.edges";
+//        //filename = "../Toy-1/graph1.edges";
+//      // filename = "../Toy-4 4095(12 Big Cycle)/graph1.edges";
+//        //filename = "/Users/naheed/NetBeansProjects/Toy-1.5 63 (6 big cycle)/graph1.edges";
+//        //filename = "/Users/naheed/NetBeansProjects/Trivial-1/graph1.edges";
+//        //filename = "../datasets/testcase_2.edges";
+//        //filename = "../Dexa-Paper Dataset/football.edges"; // american football 
+//        //filename = "../Dexa-Paper Dataset/karate.edges"; //zachary's karate club
+//         //filename = "/Users/naheed/NetBeansProjects/Toy-4 4095(12 Big Cycle)/graph1.edges";
+//        // filename = "../datasets/newdata.edges";
+//        // filename = "CA-GrQc.txt";
+//        //filename = "/Users/naheed/NetBeansProjects/Toy-2 262143/graph1.edges";
+//        filename = "../Dexa-Paper Dataset/netscience.edges"; 
+//        
+//        parsefilename();
+//		// TODO Auto-generated method stub
+//		/*if(args.length != 1){
+//         System.err.println("example command: java -cp ./ Graph graph-file");
+//         return ;
+//         }*/
+//        Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
+//
+//        try {
+//            if (!g.init()) {
+//                return;
+//            }
+//            //g.printadjmat();
+//
+//            g.compute_degre();
+//            g.getAllCliques();
+//            gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist",nodelist);
+//            for (;;) {
+//
+//                g.compute_transitive_closure();
+//                if (g.stableflag) {
+//                    break;
+//                }
+//                if(g.k_closure>2)                            
+//                    break;
+//                g.k_closure++;
+//               
+//                gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist",nodelist);
+//                g.compute_degre(); // compute degree each time before you run cliqe algorithm
+//                g.init_cliquewriter(g.k_closure);
+//                g.getAllCliques();
+//                System.out.println(g.k_closure + "-th closure:\n");
+//                    //g.printadjmat();
+//            }
+//            g.gen_configfile();
+//        } catch (IOException ex) {
+//            Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        Barcode_Computer bc = new Barcode_Computer();
+//        bc.runpersistence_algo();
+//    }
+
     public static void main(String[] args) {
-        // TODO code application logic here
-        // filename = "../datasets/0 (copy).edges";
-        // filename = "../datasets/friends.txt";
-        filename = "../datasets/3437.edges";
-        //filename = "../Toy-1/graph1.edges";
-        //filename = "../datasets/testcase_2.edges";
-        // filename = "../datasets/newdata.edges";
-        // filename = "CA-GrQc.txt";
-        parsefilename();
-		// TODO Auto-generated method stub
-		/*if(args.length != 1){
-         System.err.println("example command: java -cp ./ Graph graph-file");
-         return ;
-         }*/
-        Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
+        int []numnodesar  = {25,50,75,100,125,150,175,200};
+        int [] degar = {2,3,4,5,6};
+        for (int N:numnodesar){
+            System.out.println("Nodes: "+N);
+            for(int D:degar){
+                System.out.println("Degree: "+D);
+                try {
+                    new whatever(N,D).runwbarabasi_alb();
+                    List<Interval<Double>> firstin, secondin;
+                    System.out.println(ListofPIntervals_dim0_barb.isEmpty());
+                    double averagedist = 0;
+                    int times = 0;
+                    for (int i = 0; i < 10 - 1; i++) {
+                        firstin = ListofPIntervals_dim1_barb.get(i);
+                        for (int j = i + 1; j < 10; j++) {
+                            secondin = ListofPIntervals_dim1_barb.get(j);
+                            averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
+                            times++;
+                        }
+                    }
 
-        try {
-            if (!g.init()) {
-                return;
-            }
-            //g.printadjmat();
+                    System.out.println("(BA)AverageBottleneck dist= dim 1(Barb):-> " + averagedist/times);
 
-            g.compute_degre();
-            g.getAllCliques();
-            gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist",nodelist);
-            for (;;) {
-
-                g.compute_transitive_closure();
-                if (g.stableflag) {
-                    break;
+                } catch (Exception ex) {
+                    Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                g.k_closure++;
-                gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist",nodelist);
-                g.compute_degre(); // compute degree each time before you run cliqe algorithm
-                g.init_cliquewriter(g.k_closure);
-                g.getAllCliques();
-                System.out.println(g.k_closure + "-th closure:\n");
-                    //g.printadjmat();
+                // Run Watts Strogatz
+                try {
+                    new whatever(N,D).runwattsstrogatz();
+                    List<Interval<Double>> firstin, secondin;
+
+                    double averagedist = 0;
+                    int times = 0;
+                    for (int i = 0; i < 10 - 1; i++) {
+                        firstin = ListofPIntervals_dim1_ws.get(i);
+                        for (int j = i + 1; j < 10; j++) {
+                            secondin = ListofPIntervals_dim1_ws.get(j);
+                            averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
+                            times++;
+                        }
+                    }
+
+                    System.out.println("(WS)AverageBottleneck dist= dim 1:-> " + averagedist/times);
+
+                } catch (Exception ex) {
+                    Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                //Compare WS and BA distance
+                try {
+                    new whatever(N,D).runwattsstrogatz();
+                    List<Interval<Double>> firstin, secondin;
+
+                    double averagedist = 0;
+
+                    for (int i = 0; i < 10; i++) {
+
+                        double sum = 0;
+                        firstin = ListofPIntervals_dim1_barb.get(i);
+                        for (int j = 0; j < 10; j++) {
+                            secondin = ListofPIntervals_dim1_ws.get(j);
+                            sum += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
+
+                        }
+                        averagedist += sum/10;
+                    }
+
+                    System.out.println("(WS-BA)AverageBottleneck dist= dim 1:-> " + averagedist/10);
+
+                } catch (Exception ex) {
+                    Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            g.gen_configfile();
-        } catch (IOException ex) {
-            Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    public static class whatever {
+        
+        int N,deg_eachnode;
+        public whatever(int N,int D) {
+            this.N = N;
+            this.deg_eachnode = D;
+        }
+        
+        public void runwbarabasi_alb() throws Exception {
+            int[] seedar = {0, 1, 2, 3, 4,5,6,7,8,9,10};
+            String filename_bb = null;
+            String foldername = null;
+            
+
+            Parameter params = new Parameter();
+            params.put("name", "Barbasi-Albert");
+            params.put("N", N); //Number of Nodes
+            params.put("m", deg_eachnode); // Degree D
+            // Edges E = ND/2 always (For a fixed N and D)
+            System.out.println(params.toString());
+            
+            for (int i = 0; i < seedar.length; i++) {
+                Random rn = new Random(seedar[i]);
+                Graph randgr = null;
+                foldername = "barabasi-albert"+params.toString();
+                filename_bb = "graph1.edges";
+                String working_dir = System.getProperty("user.dir");
+                String seed_randomdirname = null;
+            //System.out.println(working_dir);
+
+                if (!FileFolder.CreateFolderifnotexists(working_dir, foldername)) {
+                    System.out.println("Couldn't create output directory");
+                    throw new Exception();
+                }
+
+                seed_randomdirname = "barabasi-albert_" + seedar[i];
+                if (!FileFolder.CreateFolderifnotexists(working_dir + "/" + foldername + "/", seed_randomdirname)) {
+                    System.out.println("Couldn't create output directory");
+                    throw new Exception();
+                }
+
+                randgr = new Barabasi_AlbertGraph(params).generate();
+                
+
+                if (randgr != null) {
+                    randgr.write_graph(working_dir + "/" + foldername + "/" + seed_randomdirname + "/" + filename_bb);
+                } else {
+                    System.out.println("ERROR!! Cann't right graph into a file");
+                }
+            }
+
+            String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/barabasi-albert"; // american football 
+            File dir = new File(prefix);
+            File[] filesList = dir.listFiles();
+            //ArrayList <Tuple> Allintervals = new ArrayList<Tuple>();
+            for (File file : filesList) {
+                filename = file.toString() + "/graph1.edges";
+
+                File graphfile = new File(filename);
+                if (graphfile.exists()) {
+                    parsefilename();
+                    Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
+
+                    try {
+                        if (!g.init()) {
+                            throw new Exception("whatever");
+                        }
+                        //g.printadjmat();
+
+                        g.compute_degre();
+                        g.getAllCliques();
+                        gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist", nodelist);
+                        for (;;) {
+
+                            g.compute_transitive_closure();
+                            if (g.stableflag) {
+                                break;
+                            }
+                            if (g.k_closure > 2) {
+                                break;
+                            }
+                            g.k_closure++;
+                            gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist", nodelist);
+
+                            g.compute_degre(); // compute degree each time before you run cliqe algorithm
+                            g.init_cliquewriter(g.k_closure);
+                            g.getAllCliques();
+                            //System.out.println(g.k_closure + "-th closure:\n");
+                            //g.printadjmat();
+                        }
+                        g.gen_configfile();
+                    } catch (IOException ex) {
+
+                    }
+                    Barcode_Computer bc = new Barcode_Computer();
+                    bc.runpersistence_algo();
+                    //ListofPIntervals_dim0_barb.add(bc.h0h1pair.x);
+                    ListofPIntervals_dim1_barb.add(bc.h0h1pair.y);
+                    // Allintervals.add(bc.h0h1pair);
+                }
+
+            }
+            // return Allintervals;
+        }
+
+        public void runwattsstrogatz() throws Exception {
+            int[] seedar = {0, 1, 2, 3, 4,5,6,7,8,9,10};
+            String filename_bb = null;
+            String foldername = null;
+                Parameter params = new Parameter();
+                params.put("name", "Watts-Strogatz");
+                params.put("N", this.N); //Number of Nodes
+                params.put("D", this.deg_eachnode); // Degree D
+                                        // Edges E = ND/2 always (For a fixed N and D)
+                params.put("p", 0.5); //Rewiring Probability
+
+            for (int i = 0; i < seedar.length; i++) {
+                Random rn = new Random(seedar[i]);
+                Graph randgr = null;
+                foldername = "watts-strogatz"+params.toString();
+                filename_bb = "graph1.edges";
+                String working_dir = System.getProperty("user.dir");
+                String seed_randomdirname = null;
+            //System.out.println(working_dir);
+
+                if (!FileFolder.CreateFolderifnotexists(working_dir, foldername)) {
+                    System.out.println("Couldn't create output directory");
+                    throw new Exception();
+                }
+
+                seed_randomdirname = "watts-strogatz_" + seedar[i];
+                if (!FileFolder.CreateFolderifnotexists(working_dir + "/" + foldername + "/", seed_randomdirname)) {
+                    System.out.println("Couldn't create output directory");
+                    throw new Exception();
+                }
+
+                randgr = new Watts_StrogatzGraph(params).generate();
+                System.out.println(randgr.toString());
+
+                if (randgr != null) {
+                    randgr.write_graph(working_dir + "/" + foldername + "/" + seed_randomdirname + "/" + filename_bb);
+                } else {
+                    System.out.println("ERROR!! Cann't right graph into a file");
+                }
+            }
+
+            String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/watts-strogatz"; // american football 
+            File dir = new File(prefix);
+            File[] filesList = dir.listFiles();
+            //ArrayList <Tuple> Allintervals = new ArrayList<Tuple>();
+            for (File file : filesList) {
+                filename = file.toString() + "/graph1.edges";
+
+                File graphfile = new File(filename);
+                if (graphfile.exists()) {
+                    parsefilename();
+                    Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
+
+                    try {
+                        if (!g.init()) {
+                            throw new Exception("whatever");
+                        }
+                        //g.printadjmat();
+
+                        g.compute_degre();
+                        g.getAllCliques();
+                        gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist", nodelist);
+                        for (;;) {
+
+                            g.compute_transitive_closure();
+                            if (g.stableflag) {
+                                break;
+                            }
+                            if (g.k_closure > 2) {
+                                break;
+                            }
+                            g.k_closure++;
+                            gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist", nodelist);
+
+                            g.compute_degre(); // compute degree each time before you run cliqe algorithm
+                            g.init_cliquewriter(g.k_closure);
+                            g.getAllCliques();
+                            //System.out.println(g.k_closure + "-th closure:\n");
+                            //g.printadjmat();
+                        }
+                        g.gen_configfile();
+                    } catch (IOException ex) {
+
+                    }
+                    Barcode_Computer bc = new Barcode_Computer();
+                    bc.runpersistence_algo();
+                    //ListofPIntervals_dim0_ws.add(bc.h0h1pair.x);
+                    ListofPIntervals_dim1_ws.add(bc.h0h1pair.y);
+                    // Allintervals.add(bc.h0h1pair);
+                }
+
+            }
+        }
+    }
+//    public List <Tuple <List<Interval<Double>>,List<Interval<Double>>>> runwattsstrogatz() throws Exception{
+//        String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/watts-strogatz"; // american football 
+//        File dir = new File(prefix);
+//        File[] filesList = dir.listFiles();
+//        List <Tuple <List<Interval<Double>>,List<Interval<Double>>>> Allintervals = null;
+//        for (File file : filesList) {
+//            filename = file.toString() + "/graph1.edges";
+//
+//            File graphfile = new File(filename);
+//            if (graphfile.exists()) {
+//                parsefilename();
+//                Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
+//
+//                try {
+//                    if (!g.init()) {
+//                        throw new Exception("whatever");
+//                    }
+//                    //g.printadjmat();
+//
+//                    g.compute_degre();
+//                    g.getAllCliques();
+//                    gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist", nodelist);
+//                    for (;;) {
+//
+//                        g.compute_transitive_closure();
+//                        if (g.stableflag) {
+//                            break;
+//                        }
+//                        if(g.k_closure>2)
+//                            break;
+//                        g.k_closure++;
+//                        gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist", nodelist);
+//                        
+//                        g.compute_degre(); // compute degree each time before you run cliqe algorithm
+//                        g.init_cliquewriter(g.k_closure);
+//                        g.getAllCliques();
+//                        System.out.println(g.k_closure + "-th closure:\n");
+//                        //g.printadjmat();
+//                    }
+//                    g.gen_configfile();
+//                } catch (IOException ex) {
+//
+//                }
+//                Barcode_Computer bc = new Barcode_Computer();
+//                bc.runpersistence_algo();
+//                Allintervals.add(bc.h0h1pair);
+//            }
+//            
+//
+//        }
+//    }
+//    
+
     static void parsefilename() {
+       // System.out.println(filename);
         String[] segs = filename.split("/");
-        String[] dotseg = segs[segs.length - 1].split("\\.");
-        Directory_name = dotseg[0];
+        String[] sub = Arrays.copyOfRange(segs, 0, segs.length - 1);
+        //String[] dotseg = .split("\\.");
+        Directory_name = String.join("/", sub);
+
         //System.out.println(Directory_name);
         working_dir = System.getProperty("user.dir");
-        fullpath_output = working_dir + "/" + Directory_name + "/";
+        fullpath_output = Directory_name + "/";
 
     }
 
@@ -103,22 +467,23 @@ public class Iterative_trans_closure_forpython {
         this.graphFname = fname;
     }
 
-
     public boolean init() throws IOException {
         ReadFromFiles reader = new ReadFromFiles();
         Vector<String> lines = new Vector<String>();
+        //System.out.println(graphFname);
         if (!reader.readin(graphFname, lines)) {
+
             System.err.println("Failed to read file: " + graphFname);
             return false;
         } else if (lines.size() <= 1) {
             System.err.println("at least one edge needed");
             return false;
         }
-                //get vertex count
+        //get vertex count
         //vertexCount = Integer.parseInt(lines.get(0));
 
         vertexCount = reader.getVertexCount();
-        //System.out.println(vertexCount);
+        System.out.println(vertexCount);
         formadjacency_mat(lines, vertexCount);
         //compute_degre();
         return true;
@@ -154,7 +519,7 @@ public class Iterative_trans_closure_forpython {
             //System.out.println();
             //System.exit(1);
         }
-       //this.printadjmat();
+        //this.printadjmat();
         // System.exit(1);
     }
 
@@ -169,7 +534,7 @@ public class Iterative_trans_closure_forpython {
                 ajacentMatrix[i][j] = false;
             }
         }
-        for (int count=0, i = 0; i < lines.size(); i++) {
+        for (int count = 0, i = 0; i < lines.size(); i++) {
             String[] tokens = lines.get(i).split(" ");
             if (tokens.length != 2) {
                 System.err.println("the format of each line/vertex: \"source-node-index target-node-index\"");
@@ -185,11 +550,11 @@ public class Iterative_trans_closure_forpython {
                 flag_file[sourceNodeIndex] = 1;
                 try {
                     this.writer.write(tokens[0] + "\n");
-                    
+
                 } catch (IOException ex) {
                     Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                nodelist[count++]=sourceNodeIndex;
+                nodelist[count++] = sourceNodeIndex;
             }
             if (flag_file[targetNodeIndex] == 0) {
                 flag_file[targetNodeIndex] = 1;
@@ -198,13 +563,13 @@ public class Iterative_trans_closure_forpython {
                 } catch (IOException ex) {
                     Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                nodelist[count++]=targetNodeIndex;
+                nodelist[count++] = targetNodeIndex;
             }
-          /*  try {
-                this.writer.write(tokens[0] + " " + tokens[1] + "\n");
-            } catch (IOException ex) {
-                Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
+            /*  try {
+             this.writer.write(tokens[0] + " " + tokens[1] + "\n");
+             } catch (IOException ex) {
+             Logger.getLogger(Iterative_trans_closure.class.getName()).log(Level.SEVERE, null, ex);
+             }*/
         }
 
     }
@@ -212,6 +577,7 @@ public class Iterative_trans_closure_forpython {
     public void compute_degre() {
         //initialize degree array;
         degreeArray = new int[vertexCount];
+        int maximumDegree = 0;
         for (int i = 0; i < vertexCount; i++) {
             degreeArray[i] = 0;
             for (int j = 0; j < vertexCount; j++) {
@@ -219,15 +585,13 @@ public class Iterative_trans_closure_forpython {
                     degreeArray[i]++;
                 }
             }
-            //System.out.println(degreeArray[i]);
-        }
-        //get maximum degree
-        int maximumDegree = 0;
-        for (int i = 0; i < vertexCount; i++) {
+            //get maximum degree
             if (degreeArray[i] > maximumDegree) {
                 maximumDegree = degreeArray[i];
             }
+            //System.out.println(degreeArray[i]);
         }
+
         //initialize vertex count with same degree
         vertexCountWithSameDegree = new int[maximumDegree + 1];
         for (int i = 0; i < maximumDegree; i++) {
@@ -239,14 +603,14 @@ public class Iterative_trans_closure_forpython {
     }
 
     public void getAllCliques() throws IOException {
-        for (int i = this.k_closure -1 ; i < vertexCountWithSameDegree.length; i++) {
+        for (int i = 0; i < maxclique; i++) {
             //check whether enough vertexes with enough degree exist
             int candidateVertexesCount = 0;
             for (int j = i; j < vertexCountWithSameDegree.length; j++) {
                 candidateVertexesCount += vertexCountWithSameDegree[j];
             }
             if (candidateVertexesCount >= i + 2) {
-                System.out.println("cliques with vertexes: " + (i + 2));
+                //System.out.println("cliques with vertexes: " + (i + 2));
                 Vector<Integer> vertexes = new Vector<Integer>();
                 for (int j = 0; j < vertexCount; j++) {
                     if (degreeArray[j] >= (i + 1)) {
@@ -254,19 +618,19 @@ public class Iterative_trans_closure_forpython {
                     }
                 }
                 int[] cliqueVertexes = new int[i + 2];
-                System.out.println("candidate vertexes count: " + vertexes.size());
+                //System.out.println("candidate vertexes count: " + vertexes.size());
                 cliquecount = 0;
                 getCliquesWithSpecificDegree(0, 0, cliqueVertexes, vertexes);
-                System.out.println(cliquecount); //checking the cliquecount. It clearly mismatches
+               //System.out.println(cliquecount); //checking the cliquecount. It clearly mismatches
                 // the number of line in the output file.
             }
         }
 
-                //this.bw.flush();
+        //this.bw.flush();
         //this.bw.close();
         this.writer.close();
-		//this.bw.close();
-        System.out.println("Done Writing Cliques\n");
+        //this.bw.close();
+        //System.out.println("Done Writing Cliques\n");
     }
 
     private void getCliquesWithSpecificDegree(int index, int start, int[] cliqueVertexes, Vector<Integer> candidateVertexes) throws IOException {
@@ -303,7 +667,7 @@ public class Iterative_trans_closure_forpython {
                 String vertices_str = "";
                 for (int i = 0; i < cliqueVertexes.length; i++) {
                     vertices_str += Integer.toString(cliqueVertexes[i]) + " ";
-					//System.out.print((cliqueVertexes[i] + 1) + " ");
+                    //System.out.print((cliqueVertexes[i] + 1) + " ");
 
                 }
                 //System.out.println(vertices_str); //what i am writing in the console
@@ -344,7 +708,7 @@ public class Iterative_trans_closure_forpython {
                 if (dir.mkdir()) {
                     //this.fos = new FileOutputStream(this.f);
                     //this.bw = new BufferedWriter(new OutputStreamWriter(this.fos));
-                    this.f = new File(fullpath_output+clique_base_filename + "_" + k + ".out");
+                    this.f = new File(fullpath_output + clique_base_filename + "_" + k + ".out");
                     this.fileWriter = new FileWriter(f);
                     this.writer = new BufferedWriter(fileWriter);
                 } else {

@@ -38,6 +38,8 @@ public class BasicHomology_triangulation_trans {
     int kclosure;
     String outputdir_path;
     List <String> dim_birth_dataarray;
+    public List<Interval<Double>> PIntervals_dim0;
+    public List<Interval<Double>> PIntervals_dim1;
     
     public BasicHomology_triangulation_trans() {
         this.read_clique_config();  
@@ -47,8 +49,11 @@ public class BasicHomology_triangulation_trans {
         List<Interval<Double>> interv;
         Interval in;
         BufferedImage im;
-        for (int i = 0; i < maxdim; i++) {
+        for (int i = 0; i < maxdim-1; i++) {
             interv = circle_intervals.getIntervalsAtDimension(i);
+            if(i==0) PIntervals_dim0 = interv;
+            if(i==1) PIntervals_dim1 = interv;
+
             try {
                 im = BarcodeVisualizer.drawBarcode(interv, "dimension: " + i, this.maxdimension); // last argument maximum limit of bar interval
                 File outputfile = new File(outputdir_path+clique_base_filename + i + "_barcode.png");
@@ -123,7 +128,7 @@ public class BasicHomology_triangulation_trans {
             while(itt.hasNext()){
                 String s = itt.next().toString();
                 try {
-                    System.out.println(s);
+                    //System.out.println(s);
                     bw.newLine();
                     bw.write(s);
                     
@@ -166,7 +171,7 @@ public class BasicHomology_triangulation_trans {
         /*
         Read all the cliques from a file line by line and add it to the simplical complex
         */
-        System.out.println("Adding from: "+simplicesout);
+        //System.out.println("Adding from: "+simplicesout);
         File f = new File(simplicesout);
         
         int maxclique = 1;
@@ -264,7 +269,7 @@ public class BasicHomology_triangulation_trans {
         BarcodeCollection<Double> circle_intervals
                 = persistence.computeIntervals(this.stream); // computing betti intervals
         
-        System.out.println(circle_intervals); // printing betti intervals
+        //System.out.println(circle_intervals); // printing betti intervals
         System.out.println("Betti numbers: "+circle_intervals.getBettiNumbers());
         generate_barcode_image(circle_intervals,maxdimension);
         generate_representative_cycle(this.stream,persistence,circle_intervals);
@@ -348,10 +353,10 @@ public class BasicHomology_triangulation_trans {
                 }
                 
                     stream.addElement(elem,kclosure-1);
-                    for (int i = 0; i < elem.length; i++) {
-                            System.out.print(elem[i]+" ");
-                        }
-                        System.out.println("");
+                    //for (int i = 0; i < elem.length; i++) {
+                            //System.out.print(elem[i]+" ");
+                      //  }
+                        //System.out.println("");
                 //System.out.println("hk: "+(kclosure-1));
             }
             System.out.println("stream size: "+stream.getSize());

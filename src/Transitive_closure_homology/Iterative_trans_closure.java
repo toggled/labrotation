@@ -5,6 +5,7 @@
  */
 package Transitive_closure_homology;
 
+import static Transitive_closure_homology.Iterative_trans_closure_forpython.filename;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,7 +47,8 @@ public class Iterative_trans_closure {
         // filename = "../datasets/0 (copy).edges";
         // filename = "../datasets/friends.txt";
         // filename = "../datasets/3437.edges";
-        filename = "../datasets/testcase_2.edges";
+        //filename = "../datasets/testcase_2.edges";
+        filename = "/Users/naheed/NetBeansProjects/Toy-2 262143/graph1.edges";
         // filename = "../datasets/newdata.edges";
         // filename = "CA-GrQc.txt";
         parsefilename();
@@ -72,8 +74,10 @@ public class Iterative_trans_closure {
                 if (g.stableflag) {
                     break;
                 }
-
+                if(g.k_closure>2)                            
+                    break;
                 g.k_closure++;
+                
                 gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist",nodelist);
                 g.compute_degre(); // compute degree each time before you run cliqe algorithm
                 g.init_cliquewriter(g.k_closure);
