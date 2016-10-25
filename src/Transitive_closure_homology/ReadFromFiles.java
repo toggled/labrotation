@@ -38,13 +38,13 @@ public class ReadFromFiles {
                             int targetNodeIndex = Integer.parseInt(st.nextToken(delem));
                             //System.out.println(targetNodeIndex);
                             if(mapping.getOrDefault(sourceNodeIndex, -1) ==-1 ){
-                                if (id == 915) System.out.println(sourceNodeIndex);
+                                //if (id == 915) System.out.println(sourceNodeIndex);
                                 mapping.put(sourceNodeIndex, id++);
                                 //mapping.put(sourceNodeIndex, sourceNodeIndex);
                                 
                             }
                             if(mapping.getOrDefault(targetNodeIndex, -1) ==-1 ){
-                                if (id == 915) System.out.println(targetNodeIndex);
+                                //if (id == 915) System.out.println(targetNodeIndex);
                                 mapping.put(targetNodeIndex, id++);
                                 //mapping.put(targetNodeIndex, targetNodeIndex);
                                 

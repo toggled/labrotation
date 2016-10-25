@@ -22,7 +22,7 @@ public class Barcode_Computer {
 //        bc.runpersistence_algo();
 //    }
     BasicHomology_triangulation_trans obj;
-    Tuple <List<Interval<Double>>,List<Interval<Double>>> h0h1pair; 
+    Tuple <List<Interval<Double>>,List<Interval<Double>>,List<Interval<Double>>> h0h1pair; 
     void runpersistence_algo(){
        
             obj = new BasicHomology_triangulation_trans();
@@ -40,7 +40,7 @@ public class Barcode_Computer {
             obj.stream.finalizeStream();
             //System.out.println(obj.stream.toString());
             obj.compute_betti_nums();
-            h0h1pair = new Tuple(obj.PIntervals_dim0,obj.PIntervals_dim1);
+            h0h1pair = new Tuple(obj.PIntervals_dim0,obj.PIntervals_dim1,obj.PIntervals_dim2);
 
     }
     
