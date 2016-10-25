@@ -53,10 +53,13 @@ public class Iterative_trans_closure_forpython {
     static String filename, Directory_name, working_dir, fullpath_output;
     static int[] nodelist;
     int maxclique = 3;
-    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_barb;
-    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_barb;
-    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_ws;
-    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_ws;
+     
+    ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_barb = new ArrayList<>();
+    ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_barb = new ArrayList<>();
+       ArrayList<List<Interval<Double>>> ListofPIntervals_dim2_barb = new ArrayList<>();
+    ArrayList<List<Interval<Double>>>   ListofPIntervals_dim0_ws = new ArrayList<>();
+    ArrayList<List<Interval<Double>>>  ListofPIntervals_dim1_ws = new ArrayList<>();
+       ArrayList<List<Interval<Double>>> ListofPIntervals_dim2_ws = new ArrayList<>();
     
 //    public static void main(String[] args) {
 //        // TODO code application logic here
@@ -82,8 +85,8 @@ public class Iterative_trans_closure_forpython {
 //         System.err.println("example command: java -cp ./ Graph graph-file");
 //         return ;
 //         }*/
-//        Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
-//
+//        Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython();
+//          g.preprocessing(filename);
 //        try {
 //            if (!g.init()) {
 //                return;
@@ -119,21 +122,28 @@ public class Iterative_trans_closure_forpython {
 //        bc.runpersistence_algo();
 //    }
 //
-    
-    public static void main(String[] args) {
-        int []numnodesar  = {25,50,75};
-        int [] degar = {2,3,4};
+    public static void main(String[] args){
+        Iterative_trans_closure_forpython ip = new Iterative_trans_closure_forpython();
+        ip.runrandomexpt();
+        
+    }
+
+    void runrandomexpt(){
+            int []numnodesar  = {25,50,75};
+            int [] degar = {2,3,4};
         for (int N:numnodesar){
             System.out.println("Nodes: "+N);
             for(int D:degar){
                 System.out.println("Degree: "+D);
-                ListofPIntervals_dim0_barb = new ArrayList<>();
-                ListofPIntervals_dim1_barb = new ArrayList<>();
-                ListofPIntervals_dim0_ws = new ArrayList<>();
-                ListofPIntervals_dim1_ws = new ArrayList<>();
                 
-                try {
-                    new whatever(N,D).runwbarabasi_alb();
+              try {
+                    runwattsstrogatz(N,D);
+                    runwbarabasi_alb(N,D);
+              }catch (Exception ex) {
+                    Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
                     List<Interval<Double>> firstin, secondin;
                    // System.out.println(ListofPIntervals_dim0_barb.isEmpty());
                     
@@ -141,10 +151,10 @@ public class Iterative_trans_closure_forpython {
                     int times = 0;
                     for (int i = 0; i < 10 - 1; i++) {
                       
-                        firstin = ListofPIntervals_dim1_barb.get(i);
+                        firstin = this.ListofPIntervals_dim1_barb.get(i);
                        
                         for (int j = i + 1; j < 10; j++) {
-                            secondin = ListofPIntervals_dim1_barb.get(j);
+                            secondin = this.ListofPIntervals_dim1_barb.get(j);
                             averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
                             times++;
                             }
@@ -153,17 +163,26 @@ public class Iterative_trans_closure_forpython {
 
                     System.out.println("(BA)AverageBottleneck dist= dim 1(Barb):-> " + averagedist/times);
 
-                } catch (Exception ex) {
-                    Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                    averagedist = 0;
+                    times = 0;
+                    for (int i = 0; i < 10 - 1; i++) {
+                      
+                        firstin = this.ListofPIntervals_dim2_barb.get(i);
+                       
+                        for (int j = i + 1; j < 10; j++) {
+                            secondin = this.ListofPIntervals_dim2_barb.get(j);
+                            averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
+                            times++;
+                            }
+ 
+                    }
 
-                // Run Watts Strogatz
-                try {
-                    new whatever(N,D).runwattsstrogatz();
-                    List<Interval<Double>> firstin, secondin;
+                    System.out.println("(BA)AverageBottleneck dist= dim 2(Barb):-> " + averagedist/times);
 
-                    double averagedist = 0;
-                    int times = 0;
+
+                        //Watts Strogatz
+                    averagedist = 0;
+                    times = 0;
                     for (int i = 0; i < 10 - 1; i++) {
                         firstin = ListofPIntervals_dim1_ws.get(i);
                         for (int j = i + 1; j < 10; j++) {
@@ -174,17 +193,25 @@ public class Iterative_trans_closure_forpython {
                     }
 
                     System.out.println("(WS)AverageBottleneck dist= dim 1:-> " + averagedist/times);
+                    
+                    averagedist = 0;
+                    times = 0;
+                    for (int i = 0; i < 10 - 1; i++) {
+                        firstin = ListofPIntervals_dim1_ws.get(i);
+                        for (int j = i + 1; j < 10; j++) {
+                            secondin = ListofPIntervals_dim1_ws.get(j);
+                            averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
+                            times++;
+                        }
+                    }
 
-                } catch (Exception ex) {
-                    Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                    System.out.println("(WS)AverageBottleneck dist= dim 2:-> " + averagedist/times);
+
 
                 //Compare WS and BA distance
-                try {
-                    new whatever(N,D).runwattsstrogatz();
-                    List<Interval<Double>> firstin, secondin;
-
-                    double averagedist = 0;
+           
+            
+                    averagedist = 0;
 
                     for (int i = 0; i < 10; i++) {
 
@@ -200,22 +227,31 @@ public class Iterative_trans_closure_forpython {
 
                     System.out.println("(WS-BA)AverageBottleneck dist= dim 1:-> " + averagedist/10);
 
-                } catch (Exception ex) {
-                    Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
+                    
+                    averagedist = 0;
 
-    public static class whatever {
-        
-        int N,deg_eachnode;
-        public whatever(int N,int D) {
-            this.N = N;
-            this.deg_eachnode = D;
+                    for (int i = 0; i < 10; i++) {
+
+                        double sum = 0;
+                        firstin = ListofPIntervals_dim2_barb.get(i);
+                        for (int j = 0; j < 10; j++) {
+                            secondin = ListofPIntervals_dim2_ws.get(j);
+                            sum += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
+
+                        }
+                        averagedist += sum/10;
+                    }
+
+                    System.out.println("(WS-BA)AverageBottleneck dist= dim 1:-> " + averagedist/10);
+
+                    
         }
+    
+
+
         
-        public void runwbarabasi_alb() throws Exception {
+        public void runwbarabasi_alb(int N,int D) throws Exception {
+            int deg_eachnode = D;
             int[] seedar = {0, 1, 2, 3, 4,5,6,7,8,9,10};
             String filename_bb = null;
             String foldername = null;
@@ -224,7 +260,7 @@ public class Iterative_trans_closure_forpython {
             Parameter params = new Parameter();
             params.put("name", "Barbasi-Albert");
             params.put("N", N); //Number of Nodes
-            params.put("m", deg_eachnode); // Degree D
+            params.put("D", deg_eachnode); // Degree D
             // Edges E = ND/2 always (For a fixed N and D)
             System.out.println(params.toString());
             
@@ -259,21 +295,21 @@ public class Iterative_trans_closure_forpython {
             
 
             //String prefix = working_dir + "/" + foldername + "/" + seed_randomdirname; // american football 
-            String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/barabasi-albert";
+            String prefix = working_dir + "/" + foldername + "/" + seed_randomdirname;
             File dir = new File(prefix);
             File[] filesList = dir.listFiles();
-            
+             
             //ArrayList <Tuple> Allintervals = new ArrayList<Tuple>();
             for (File file : filesList) {
                 
-                filename = file.toString()+"/"+filename_bb;
+                filename = file.toString();
                 
                 File graphfile = new File(filename);
-                //System.out.println(filename);
+                System.out.println(filename);
                 if (graphfile.exists()) {
                     parsefilename();
-                    Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
-
+                    Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython();
+                    g.preprocessing(filename);
                     try {
                         if (!g.init()) {
                             throw new Exception("whatever");
@@ -307,8 +343,10 @@ public class Iterative_trans_closure_forpython {
                     }
                     Barcode_Computer bc = new Barcode_Computer();
                     bc.runpersistence_algo();
+                    
                     //ListofPIntervals_dim0_barb.add(bc.h0h1pair.x);
-                    ListofPIntervals_dim1_barb.add(bc.h0h1pair.y);
+                    this.ListofPIntervals_dim1_barb.add(bc.h0h1pair.y);
+                    this.ListofPIntervals_dim2_ws.add(bc.h0h1pair.z);
                     // Allintervals.add(bc.h0h1pair);
                 }
             }
@@ -317,14 +355,14 @@ public class Iterative_trans_closure_forpython {
             // return Allintervals;
         }
 
-        public void runwattsstrogatz() throws Exception {
-            int[] seedar = {0, 1, 2, 3, 4,5,6,7,8,9,10};
+        public void runwattsstrogatz(int N,int D) throws Exception {
+            int[] seedar = {0};
             String filename_bb = null;
             String foldername = null;
                 Parameter params = new Parameter();
                 params.put("name", "Watts-Strogatz");
-                params.put("N", this.N); //Number of Nodes
-                params.put("D", this.deg_eachnode); // Degree D
+                params.put("N", N); //Number of Nodes
+                params.put("D", D); // Degree D
                                         // Edges E = ND/2 always (For a fixed N and D)
                 params.put("p", 0.5); //Rewiring Probability
 
@@ -356,21 +394,21 @@ public class Iterative_trans_closure_forpython {
                 } else {
                     System.out.println("ERROR!! Cann't right graph into a file");
                 }
-            }
+            
 
             //String prefix = "/home/naheed/NetBeansProjects/structural_holeTDA/watts-strogatz"; // american football 
-            String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/watts-strogatz";
+            String prefix = working_dir + "/" + foldername + "/" + seed_randomdirname;
             File dir = new File(prefix);
             File[] filesList = dir.listFiles();
             //ArrayList <Tuple> Allintervals = new ArrayList<Tuple>();
             for (File file : filesList) {
                 filename = file.toString();
-
+                //System.out.println(filename);
                 File graphfile = new File(filename);
-                if (graphfile.exists()) {
+                if (graphfile.exists() && graphfile.getName().endsWith(".edges")) {
                     parsefilename();
-                    Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
-
+                    Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython();
+                    g.preprocessing(filename);
                     try {
                         if (!g.init()) {
                             throw new Exception("whatever");
@@ -405,13 +443,14 @@ public class Iterative_trans_closure_forpython {
                     Barcode_Computer bc = new Barcode_Computer();
                     bc.runpersistence_algo();
                     //ListofPIntervals_dim0_ws.add(bc.h0h1pair.x);
-                    ListofPIntervals_dim1_ws.add(bc.h0h1pair.y);
+                    this.ListofPIntervals_dim1_ws.add(bc.h0h1pair.y);
+                    this.ListofPIntervals_dim2_ws.add(bc.h0h1pair.z);
                     // Allintervals.add(bc.h0h1pair);
                 }
-
             }
+           }
         }
-    }
+
     
 //    public List <Tuple <List<Interval<Double>>,List<Interval<Double>>>> runwattsstrogatz() throws Exception{
 //        String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/watts-strogatz"; // american football 
@@ -478,10 +517,11 @@ public class Iterative_trans_closure_forpython {
         fullpath_output = Directory_name + "/";
 
     }
-
-    public Iterative_trans_closure_forpython(String fname) {
+    public Iterative_trans_closure_forpython(){
+        
+    }
+    public void preprocessing(String fname) {
         init_cliquewriter(k_closure);
-
         this.graphFname = fname;
     }
 
