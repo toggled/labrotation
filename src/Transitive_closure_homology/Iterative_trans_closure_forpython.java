@@ -53,10 +53,10 @@ public class Iterative_trans_closure_forpython {
     static String filename, Directory_name, working_dir, fullpath_output;
     static int[] nodelist;
     int maxclique = 3;
-    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_barb = new ArrayList<>();
-    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_barb = new ArrayList<>();
-    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_ws = new ArrayList<>();
-    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_ws = new ArrayList<>();
+    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_barb;
+    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_barb;
+    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_ws;
+    static ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_ws;
     
 //    public static void main(String[] args) {
 //        // TODO code application logic here
@@ -68,13 +68,13 @@ public class Iterative_trans_closure_forpython {
 //        //filename = "/Users/naheed/NetBeansProjects/Toy-1.5 63 (6 big cycle)/graph1.edges";
 //        //filename = "/Users/naheed/NetBeansProjects/Trivial-1/graph1.edges";
 //        //filename = "../datasets/testcase_2.edges";
-//        //filename = "../Dexa-Paper Dataset/football.edges"; // american football 
+//       // filename = "../Dexa-Paper Dataset/football.edges"; // american football 
 //        //filename = "../Dexa-Paper Dataset/karate.edges"; //zachary's karate club
 //         //filename = "/Users/naheed/NetBeansProjects/Toy-4 4095(12 Big Cycle)/graph1.edges";
 //        // filename = "../datasets/newdata.edges";
-//        // filename = "CA-GrQc.txt";
-//        //filename = "/Users/naheed/NetBeansProjects/Toy-2 262143/graph1.edges";
-//        filename = "../Dexa-Paper Dataset/netscience.edges"; 
+//       //  filename = "CA-GrQc.txt";
+//       // filename = "../Toy-2 262143/graph1.edges";
+//        //filename = "../Dexa-Paper Dataset/netscience.edges"; 
 //        
 //        parsefilename();
 //		// TODO Auto-generated method stub
@@ -94,13 +94,14 @@ public class Iterative_trans_closure_forpython {
 //            g.getAllCliques();
 //            gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist",nodelist);
 //            for (;;) {
-//
+//                if(g.k_closure>2)                            
+//                    break;
+//                
 //                g.compute_transitive_closure();
 //                if (g.stableflag) {
 //                    break;
 //                }
-//                if(g.k_closure>2)                            
-//                    break;
+//                
 //                g.k_closure++;
 //               
 //                gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist",nodelist);
@@ -117,7 +118,8 @@ public class Iterative_trans_closure_forpython {
 //        Barcode_Computer bc = new Barcode_Computer();
 //        bc.runpersistence_algo();
 //    }
-
+//
+    
     public static void main(String[] args) {
         int []numnodesar  = {25,50,75,100,125,150,175,200};
         int [] degar = {2,3,4,5,6};
@@ -125,19 +127,28 @@ public class Iterative_trans_closure_forpython {
             System.out.println("Nodes: "+N);
             for(int D:degar){
                 System.out.println("Degree: "+D);
+                ListofPIntervals_dim0_barb = new ArrayList<>();
+                ListofPIntervals_dim1_barb = new ArrayList<>();
+                ListofPIntervals_dim0_ws = new ArrayList<>();
+                ListofPIntervals_dim1_ws = new ArrayList<>();
+                
                 try {
                     new whatever(N,D).runwbarabasi_alb();
                     List<Interval<Double>> firstin, secondin;
-                    System.out.println(ListofPIntervals_dim0_barb.isEmpty());
+                   // System.out.println(ListofPIntervals_dim0_barb.isEmpty());
+                    
                     double averagedist = 0;
                     int times = 0;
                     for (int i = 0; i < 10 - 1; i++) {
+                      
                         firstin = ListofPIntervals_dim1_barb.get(i);
+                       
                         for (int j = i + 1; j < 10; j++) {
                             secondin = ListofPIntervals_dim1_barb.get(j);
                             averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
                             times++;
-                        }
+                            }
+ 
                     }
 
                     System.out.println("(BA)AverageBottleneck dist= dim 1(Barb):-> " + averagedist/times);
@@ -220,11 +231,11 @@ public class Iterative_trans_closure_forpython {
             for (int i = 0; i < seedar.length; i++) {
                 Random rn = new Random(seedar[i]);
                 Graph randgr = null;
-                foldername = "barabasi-albert"+params.toString();
+                foldername = params.toString();
                 filename_bb = "graph1.edges";
                 String working_dir = System.getProperty("user.dir");
                 String seed_randomdirname = null;
-            //System.out.println(working_dir);
+              System.out.println(working_dir);
 
                 if (!FileFolder.CreateFolderifnotexists(working_dir, foldername)) {
                     System.out.println("Couldn't create output directory");
@@ -245,17 +256,22 @@ public class Iterative_trans_closure_forpython {
                 } else {
                     System.out.println("ERROR!! Cann't right graph into a file");
                 }
-            }
+            
 
-            String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/barabasi-albert"; // american football 
+            String prefix = working_dir + "/" + foldername + "/" + seed_randomdirname; // american football 
             File dir = new File(prefix);
             File[] filesList = dir.listFiles();
+            
             //ArrayList <Tuple> Allintervals = new ArrayList<Tuple>();
             for (File file : filesList) {
-                filename = file.toString() + "/graph1.edges";
-
+                
+                filename = file.toString();
+                
                 File graphfile = new File(filename);
+                System.out.println(filename);
                 if (graphfile.exists()) {
+                    
+                    System.exit(1);
                     parsefilename();
                     Iterative_trans_closure_forpython g = new Iterative_trans_closure_forpython(filename);
 
@@ -296,6 +312,7 @@ public class Iterative_trans_closure_forpython {
                     ListofPIntervals_dim1_barb.add(bc.h0h1pair.y);
                     // Allintervals.add(bc.h0h1pair);
                 }
+            }
 
             }
             // return Allintervals;
@@ -315,7 +332,7 @@ public class Iterative_trans_closure_forpython {
             for (int i = 0; i < seedar.length; i++) {
                 Random rn = new Random(seedar[i]);
                 Graph randgr = null;
-                foldername = "watts-strogatz"+params.toString();
+                foldername = params.toString();
                 filename_bb = "graph1.edges";
                 String working_dir = System.getProperty("user.dir");
                 String seed_randomdirname = null;
@@ -342,12 +359,12 @@ public class Iterative_trans_closure_forpython {
                 }
             }
 
-            String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/watts-strogatz"; // american football 
+            String prefix = "/home/naheed/NetBeansProjects/structural_holeTDA/watts-strogatz"; // american football 
             File dir = new File(prefix);
             File[] filesList = dir.listFiles();
             //ArrayList <Tuple> Allintervals = new ArrayList<Tuple>();
             for (File file : filesList) {
-                filename = file.toString() + "/graph1.edges";
+                filename = file.toString();
 
                 File graphfile = new File(filename);
                 if (graphfile.exists()) {
@@ -395,6 +412,7 @@ public class Iterative_trans_closure_forpython {
             }
         }
     }
+    
 //    public List <Tuple <List<Interval<Double>>,List<Interval<Double>>>> runwattsstrogatz() throws Exception{
 //        String prefix = "/Users/naheed/NetBeansProjects/jplex_explore/watts-strogatz"; // american football 
 //        File dir = new File(prefix);
@@ -713,7 +731,6 @@ public class Iterative_trans_closure_forpython {
                     this.writer = new BufferedWriter(fileWriter);
                 } else {
                     System.out.println("Cannot create output directory! Exiting.. \n");
-                    System.exit(1);
                 }
             }
         } catch (IOException ex) {
@@ -731,7 +748,7 @@ public class Iterative_trans_closure_forpython {
             bw = new BufferedWriter(fw);
             bw.write("cliquefile=" + this.clique_base_filename + "\n");
 
-            bw.write("maxclosure=" + String.valueOf(this.k_closure) + "\n");
+            bw.write("maxclosure=" + String.valueOf(this.maxclique) + "\n");
             bw.write("graphfile=" + graph_base_filename + "\n");
             bw.write("outputdir=" + fullpath_output);
         } catch (IOException ex) {

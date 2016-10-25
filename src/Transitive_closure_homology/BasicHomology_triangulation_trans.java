@@ -270,11 +270,11 @@ public class BasicHomology_triangulation_trans {
         BarcodeCollection<Double> circle_intervals
                 = persistence.computeIntervals(this.stream); // computing betti intervals
         
-        //System.out.println(circle_intervals); // printing betti intervals
+        System.out.println(circle_intervals); // printing betti intervals
         System.out.println("Betti numbers: "+circle_intervals.getBettiNumbers());
         generate_barcode_image(circle_intervals, maxdimension);
         generate_representative_cycle(this.stream, persistence,circle_intervals);
-        //System.out.println(stream.validateVerbose());
+        System.out.println(stream.validateVerbose());
     }
     void add_to_stream(String simplicesfile,int k){
         System.out.println("Adding from: "+simplicesfile);
