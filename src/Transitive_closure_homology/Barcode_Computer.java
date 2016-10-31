@@ -4,9 +4,7 @@
  * and open the template in the editor.
  */
 package Transitive_closure_homology;
-import Util.Tuple;
-import edu.stanford.math.plex4.homology.barcodes.Interval;
-import java.util.List;
+import edu.stanford.math.plex4.homology.barcodes.BarcodeCollection;
 /**
  *
  * @author naheed
@@ -22,13 +20,13 @@ public class Barcode_Computer {
 //        bc.runpersistence_algo();
 //    }
     BasicHomology_triangulation_trans obj;
-    Tuple <List<Interval<Double>>,List<Interval<Double>>,List<Interval<Double>>> h0h1pair; 
+    
     void runpersistence_algo(){
        
             obj = new BasicHomology_triangulation_trans();
             obj.stream = obj.build_stream(1);
             System.out.println("max closure: "+BasicHomology_triangulation_trans.max_closure);
-            for(int i  = 2; i< BasicHomology_triangulation_trans.max_closure ;i++){
+            for(int i  = 2; i<= BasicHomology_triangulation_trans.max_closure ;i++){
 
 
                 //obj.compute_betti_nums();  
@@ -40,8 +38,10 @@ public class Barcode_Computer {
             obj.stream.finalizeStream();
             //System.out.println(obj.stream.toString());
             obj.compute_betti_nums();
-            h0h1pair = new Tuple(obj.PIntervals_dim0,obj.PIntervals_dim1,obj.PIntervals_dim2);
 
+    }
+    BarcodeCollection<Double> getIntervals(){
+        return obj.intervals;
     }
     
 }

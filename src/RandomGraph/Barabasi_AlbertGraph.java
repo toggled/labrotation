@@ -7,8 +7,6 @@ package RandomGraph;
 
 import java.util.Random;
 import java.util.ArrayList;
-import java.util.Collections;
-import org.junit.experimental.theories.PotentialAssignment;
 /**
  *
  * @author naheed
@@ -19,9 +17,9 @@ public class Barabasi_AlbertGraph extends Graph implements RandomGraph {
     public Barabasi_AlbertGraph(Parameter graph_parameters) {
 
         num_nodes = (Integer) graph_parameters.get("N");
-        degree_pernode = (Integer) graph_parameters.get("m");
+        degree_pernode = (Integer) graph_parameters.get("D");
         
-        System.out.println("N: "+num_nodes+" m: "+degree_pernode);
+        System.out.println("N: "+num_nodes+" D: "+degree_pernode);
     }
     public String get_name(){
         return "Bar-Albert_"+String.valueOf(this.num_nodes)+"_"+String.valueOf(this.numedges);
@@ -64,7 +62,7 @@ public class Barabasi_AlbertGraph extends Graph implements RandomGraph {
 
                 }
             }
-           // this.print_matrix();
+           //this.print_matrix();
             //System.out.println("");
             existing_nodes.add(curnode);
                 

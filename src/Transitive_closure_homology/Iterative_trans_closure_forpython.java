@@ -13,6 +13,7 @@ import Util.FileFolder;
 import Util.Tuple;
 import edu.stanford.math.plex4.homology.barcodes.Interval;
 import edu.stanford.math.plex4.bottleneck.BottleneckDistance;
+import edu.stanford.math.plex4.homology.barcodes.BarcodeCollection;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,14 +53,15 @@ public class Iterative_trans_closure_forpython {
     String clique_base_filename = "pclique";
     static String filename, Directory_name, working_dir, fullpath_output;
     static int[] nodelist;
-    int maxclique = 3;
+    int maxclique = 2;
      
-    ArrayList<List<Interval<Double>>> ListofPIntervals_dim0_barb = new ArrayList<>();
-    ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_barb = new ArrayList<>();
-       ArrayList<List<Interval<Double>>> ListofPIntervals_dim2_barb = new ArrayList<>();
-    ArrayList<List<Interval<Double>>>   ListofPIntervals_dim0_ws = new ArrayList<>();
-    ArrayList<List<Interval<Double>>>  ListofPIntervals_dim1_ws = new ArrayList<>();
-       ArrayList<List<Interval<Double>>> ListofPIntervals_dim2_ws = new ArrayList<>();
+    ArrayList<BarcodeCollection<Double>> ListofPIntervals_barb = new ArrayList<>();
+    ArrayList<BarcodeCollection<Double>> ListofPIntervals_ws = new ArrayList<>();
+//    ArrayList<List<Interval<Double>>> ListofPIntervals_dim1_barb = new ArrayList<>();
+//       ArrayList<List<Interval<Double>>> ListofPIntervals_dim2_barb = new ArrayList<>();
+//    ArrayList<List<Interval<Double>>>   ListofPIntervals_dim0_ws = new ArrayList<>();
+//    ArrayList<List<Interval<Double>>>  ListofPIntervals_dim1_ws = new ArrayList<>();
+//       ArrayList<List<Interval<Double>>> ListofPIntervals_dim2_ws = new ArrayList<>();
     
 //    public static void main(String[] args) {
 //        // TODO code application logic here
@@ -77,7 +79,7 @@ public class Iterative_trans_closure_forpython {
 //        // filename = "../datasets/newdata.edges";
 //       //  filename = "CA-GrQc.txt";
 //       // filename = "../Toy-2 262143/graph1.edges";
-//        //filename = "../Dexa-Paper Dataset/netscience.edges"; 
+//        filename = "../Dexa-Paper Dataset/netscience.edges"; 
 //        
 //        parsefilename();
 //		// TODO Auto-generated method stub
@@ -97,13 +99,14 @@ public class Iterative_trans_closure_forpython {
 //            g.getAllCliques();
 //            gwriter.write_graph(g.ajacentMatrix, fullpath_output + graph_base_filename + g.k_closure + ".edges", "edgelist",nodelist);
 //            for (;;) {
-//                if(g.k_closure>2)                            
-//                    break;
-//                
+//
 //                g.compute_transitive_closure();
 //                if (g.stableflag) {
 //                    break;
 //                }
+//                if(g.k_closure>2)                            
+//                    break;
+//                
 //                
 //                g.k_closure++;
 //               
@@ -121,7 +124,7 @@ public class Iterative_trans_closure_forpython {
 //        Barcode_Computer bc = new Barcode_Computer();
 //        bc.runpersistence_algo();
 //    }
-//
+
     public static void main(String[] args){
         Iterative_trans_closure_forpython ip = new Iterative_trans_closure_forpython();
         ip.runrandomexpt();
@@ -129,40 +132,44 @@ public class Iterative_trans_closure_forpython {
     }
 
     void runrandomexpt(){
-            int []numnodesar  = {25,50,75};
-            int [] degar = {2,3,4};
+        int MaxSEED = 20;
+            int []numnodesar  = {200,300,400};
+            int [] degar = {5,10,15};
         for (int N:numnodesar){
             System.out.println("Nodes: "+N);
             for(int D:degar){
                 System.out.println("Degree: "+D);
-                
+                this.ListofPIntervals_barb.clear();
+                this.ListofPIntervals_ws.clear();
               try {
                     runwattsstrogatz(N,D);
                     runwbarabasi_alb(N,D);
               }catch (Exception ex) {
                     Logger.getLogger(Iterative_trans_closure_forpython.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
-        }
-                    List<Interval<Double>> firstin, secondin;
+     
+                List<Interval<Double>> firstin, secondin;
                    // System.out.println(ListofPIntervals_dim0_barb.isEmpty());
                     
                     double averagedist = 0;
                     int times = 0;
-                    for (int i = 0; i < 10 - 1; i++) {
+                    for (int i = 0; i < MaxSEED - 1; i++) {
                       
-                        firstin = this.ListofPIntervals_dim1_barb.get(i);
-                       
-                        for (int j = i + 1; j < 10; j++) {
-                            secondin = this.ListofPIntervals_dim1_barb.get(j);
+                        firstin = this.ListofPIntervals_barb.get(i).getIntervalsAtDimension(1);
+                        if(firstin.isEmpty()) continue;
+                        for (int j = i + 1; j < MaxSEED; j++) {
+                            secondin = this.ListofPIntervals_barb.get(j).getIntervalsAtDimension(1);
+                            if(secondin.isEmpty()) continue;
                             averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
+                            
                             times++;
                             }
  
                     }
-
+                    if(averagedist/times >1000) System.out.println(averagedist + " "+times);  
                     System.out.println("(BA)AverageBottleneck dist= dim 1(Barb):-> " + averagedist/times);
 
+                    /*
                     averagedist = 0;
                     times = 0;
                     for (int i = 0; i < 10 - 1; i++) {
@@ -178,56 +185,62 @@ public class Iterative_trans_closure_forpython {
                     }
 
                     System.out.println("(BA)AverageBottleneck dist= dim 2(Barb):-> " + averagedist/times);
-
+                    */
 
                         //Watts Strogatz
                     averagedist = 0;
                     times = 0;
-                    for (int i = 0; i < 10 - 1; i++) {
-                        firstin = ListofPIntervals_dim1_ws.get(i);
-                        for (int j = i + 1; j < 10; j++) {
-                            secondin = ListofPIntervals_dim1_ws.get(j);
+                    for (int i = 0; i < MaxSEED - 1; i++) {
+                        firstin = this.ListofPIntervals_ws.get(i).getIntervalsAtDimension(1);
+                        if(firstin.isEmpty()) continue;
+                        for (int j = i + 1; j < MaxSEED; j++) {
+                            secondin = this.ListofPIntervals_ws.get(j).getIntervalsAtDimension(1);
+                            if(secondin.isEmpty()) continue;
                             averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
                             times++;
+                            
                         }
                     }
-
+                    if(averagedist/times > 1000) System.out.println(averagedist+" "+times);
                     System.out.println("(WS)AverageBottleneck dist= dim 1:-> " + averagedist/times);
                     
-                    averagedist = 0;
-                    times = 0;
-                    for (int i = 0; i < 10 - 1; i++) {
-                        firstin = ListofPIntervals_dim1_ws.get(i);
-                        for (int j = i + 1; j < 10; j++) {
-                            secondin = ListofPIntervals_dim1_ws.get(j);
-                            averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
-                            times++;
-                        }
-                    }
-
-                    System.out.println("(WS)AverageBottleneck dist= dim 2:-> " + averagedist/times);
+//                    averagedist = 0;
+//                    times = 0;
+//                    for (int i = 0; i < 10 - 1; i++) {
+//                        firstin = ListofPIntervals_dim1_ws.get(i);
+//                        for (int j = i + 1; j < 10; j++) {
+//                            secondin = ListofPIntervals_dim1_ws.get(j);
+//                            averagedist += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
+//                            times++;
+//                        }
+//                    }
+//
+//                    System.out.println("(WS)AverageBottleneck dist= dim 2:-> " + averagedist/times);
 
 
                 //Compare WS and BA distance
            
             
                     averagedist = 0;
-
-                    for (int i = 0; i < 10; i++) {
+                    times = 0;
+                    for (int i = 0; i < MaxSEED; i++) {
 
                         double sum = 0;
-                        firstin = ListofPIntervals_dim1_barb.get(i);
-                        for (int j = 0; j < 10; j++) {
-                            secondin = ListofPIntervals_dim1_ws.get(j);
+                        firstin = this.ListofPIntervals_barb.get(i).getIntervalsAtDimension(1);
+                        int timess = 0;
+                        for (int j = 0; j < MaxSEED; j++) {
+                            secondin = this.ListofPIntervals_ws.get(j).getIntervalsAtDimension(1);
+                            if(secondin.isEmpty()) continue;
                             sum += BottleneckDistance.computeBottleneckDistance(firstin, secondin);
-
+                            timess++;
                         }
-                        averagedist += sum/10;
+                        averagedist += sum/timess;
+                        times++;
                     }
+                       if(averagedist/times > 1000) System.out.println(averagedist+" "+times);
+                    System.out.println("(WS-BA)AverageBottleneck dist= dim 1:-> " + averagedist/times);
 
-                    System.out.println("(WS-BA)AverageBottleneck dist= dim 1:-> " + averagedist/10);
-
-                    
+                 /*   
                     averagedist = 0;
 
                     for (int i = 0; i < 10; i++) {
@@ -242,17 +255,18 @@ public class Iterative_trans_closure_forpython {
                         averagedist += sum/10;
                     }
 
-                    System.out.println("(WS-BA)AverageBottleneck dist= dim 1:-> " + averagedist/10);
+                    System.out.println("(WS-BA)AverageBottleneck dist= dim 2:-> " + averagedist/10);
+                    */
 
-                    
+            }
         }
-    
+    } 
 
 
         
         public void runwbarabasi_alb(int N,int D) throws Exception {
             int deg_eachnode = D;
-            int[] seedar = {0, 1, 2, 3, 4,5,6,7,8,9,10};
+            int[] seedar = {0, 1, 2, 3, 4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
             String filename_bb = null;
             String foldername = null;
             
@@ -285,7 +299,8 @@ public class Iterative_trans_closure_forpython {
                 }
 
                 randgr = new Barabasi_AlbertGraph(params).generate();
-                
+                //randgr.print_matrix();
+                //System.exit(1);
 
                 if (randgr != null) {
                     randgr.write_graph(working_dir + "/" + foldername + "/" + seed_randomdirname + "/" + filename_bb);
@@ -344,10 +359,8 @@ public class Iterative_trans_closure_forpython {
                     Barcode_Computer bc = new Barcode_Computer();
                     bc.runpersistence_algo();
                     
-                    //ListofPIntervals_dim0_barb.add(bc.h0h1pair.x);
-                    this.ListofPIntervals_dim1_barb.add(bc.h0h1pair.y);
-                    this.ListofPIntervals_dim2_ws.add(bc.h0h1pair.z);
-                    // Allintervals.add(bc.h0h1pair);
+                   this.ListofPIntervals_barb.add(bc.getIntervals());
+
                 }
             }
 
@@ -356,7 +369,7 @@ public class Iterative_trans_closure_forpython {
         }
 
         public void runwattsstrogatz(int N,int D) throws Exception {
-            int[] seedar = {0};
+            int[] seedar = {0, 1, 2, 3, 4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
             String filename_bb = null;
             String foldername = null;
                 Parameter params = new Parameter();
@@ -443,8 +456,8 @@ public class Iterative_trans_closure_forpython {
                     Barcode_Computer bc = new Barcode_Computer();
                     bc.runpersistence_algo();
                     //ListofPIntervals_dim0_ws.add(bc.h0h1pair.x);
-                    this.ListofPIntervals_dim1_ws.add(bc.h0h1pair.y);
-                    this.ListofPIntervals_dim2_ws.add(bc.h0h1pair.z);
+                    this.ListofPIntervals_ws.add(bc.getIntervals());
+                    //this.ListofPIntervals_dim2_ws.add(bc.h0h1pair.z);
                     // Allintervals.add(bc.h0h1pair);
                 }
             }

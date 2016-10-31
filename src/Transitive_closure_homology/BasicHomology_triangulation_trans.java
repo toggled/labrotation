@@ -38,9 +38,7 @@ public class BasicHomology_triangulation_trans {
     int kclosure;
     String outputdir_path;
     List <String> dim_birth_dataarray;
-    public List<Interval<Double>> PIntervals_dim0;
-    public List<Interval<Double>> PIntervals_dim1;
-    public List<Interval<Double>> PIntervals_dim2;
+    public BarcodeCollection<Double> intervals;
     
     public BasicHomology_triangulation_trans() {
         this.read_clique_config();  
@@ -52,9 +50,7 @@ public class BasicHomology_triangulation_trans {
         BufferedImage im;
         for (int i = 0; i < maxdim; i++) {
             interv = circle_intervals.getIntervalsAtDimension(i);
-            if(i==0) PIntervals_dim0 = interv;
-            if(i==1) PIntervals_dim1 = interv;
-            if(i==2) PIntervals_dim2 = interv;   
+            intervals = circle_intervals;  
             try {
                 im = BarcodeVisualizer.drawBarcode(interv, "dimension: " + i, this.maxdimension); // last argument maximum limit of bar interval
                 File outputfile = new File(outputdir_path+clique_base_filename + i + "_barcode.png");
@@ -270,11 +266,12 @@ public class BasicHomology_triangulation_trans {
         BarcodeCollection<Double> circle_intervals
                 = persistence.computeIntervals(this.stream); // computing betti intervals
         
-        System.out.println(circle_intervals); // printing betti intervals
+        //System.out.println(circle_intervals); // printing betti intervals
         System.out.println("Betti numbers: "+circle_intervals.getBettiNumbers());
         generate_barcode_image(circle_intervals, maxdimension);
         generate_representative_cycle(this.stream, persistence,circle_intervals);
-        System.out.println(stream.validateVerbose());
+        //System.out.println(stream.validateVerbose());
+        
     }
     void add_to_stream(String simplicesfile,int k){
         System.out.println("Adding from: "+simplicesfile);
